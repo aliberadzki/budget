@@ -1,0 +1,15 @@
+group 'pl.aliberadzki'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'idea'
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.11',
+            'info.cukes:cucumber-java8:1.2.4',
+            'info.cukes:cucumber-picocontainer:1.2.4'
+}
