@@ -1,7 +1,7 @@
 package pl.aliberadzki.budget;
 
 import cucumber.api.PendingException;
-import cucumber.api.java.en.*;
+import cucumber.api.java.pl.*;
 
 import static org.junit.Assert.*;
 
@@ -13,19 +13,19 @@ public class AddingStepDefs {
     private int b;
     private int sum;
 
-    @Given("^I have two integers$")
+    @Zakładając("^I have two integers$")
     public void iHaveTwoIntegers() {
         a = 2;
         b = 3;
     }
 
-    @When("^I ask system for their sum$")
+    @Kiedy("^I ask system for their sum$")
     public void askSystemForTheirSum() {
         // Write code here that turns the phrase above into concrete actions
         sum = Calculator.sum(a,b);
     }
 
-    @Then("^I should get their arithmetic sum$")
+    @Wtedy("^I should get their arithmetic sum$")
     public void iShouldGetTheirArithmeticSum() {
         assertEquals(a+b, sum);
     }
