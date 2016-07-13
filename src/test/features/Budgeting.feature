@@ -8,6 +8,8 @@ Background
   And: Dodałem do niego kategorię przychodu Wynagrodzenie
   And: Dodałem do niego kategorię wydatku Jedzenie
   And: Dodałem do niego kategorię wydatku Mieszkanie
+  And: Dodałem do niego kategorię oszczędności Poduszka
+  And: Dodałem do niego kategorię oszczędności Emerytura
   And: Do kategorii wydatku Jedzenie dodałem podkategorię Jedzenie w domu
   And: Do kategorii wydatku Jedzenie dodałem podkategorię Jedzenie na mieście
   And: Do kategorii wydatku Mieszkanie dodałem podkategorię Czynsz
@@ -17,8 +19,12 @@ Background
   And: Wydatki na Czynsz szacuję na 500
   And: Wydatki na Prąd szacuję na 300
   And: Przychody z Wynagrodzenie szacuję na 10000
+  And: Inwestycje na Poduszka szacuję na 2000
+  And: Inwestycje na Emerytura szacuję na 2000
 
 # Budzet moze byc modyfikowany o nastepujacy sposob:
+  Scenario: Modyfikacja wydatku od dziś
+  Given: Wydatki na Jedzenie w domu od dziś szacuję na 1200
 #- od tego okresu planowane wydatki na kategorie x to y
 #- w tym okresie planowane wydatki na kategorie x to y
 
