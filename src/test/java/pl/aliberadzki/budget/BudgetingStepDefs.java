@@ -12,14 +12,6 @@ import static org.junit.Assert.*;
  */
 
 
-@CucumberOptions(  monochrome = true,
-        tags = "@tags",
-        features = "src/test/resources/features/",
-        format = { "pretty","html: cucumber-html-reports",
-                "json: cucumber-html-reports/cucumber.json" },
-        dryRun = false,
-        glue = "pl.aliberadzki.budget" )
-
 public class BudgetingStepDefs {
     private String baseBudget;
 
@@ -53,14 +45,16 @@ public class BudgetingStepDefs {
 
     @And("^Jest w nim kategoria wydatków o nazwie Jedzenie$")
     public void Jest_w_nim_kategoria_wydatków_o_nazwie_Jedzenie() throws Throwable {
-        if(baseBudget.indexOf("j") == -1) {
+        if(!baseBudget.contains("j")) {
             baseBudget += "j";
         }
     }
 
     @When("^Utworzę kategorie wydatków o nazwie: Jedzenie$")
     public void Utworzę_kategorie_wydatków_o_nazwie_Jedzenie() throws Throwable {
-        baseBudget += "j";
+        if(!baseBudget.contains("j")) {
+            baseBudget += "j";
+        }
     }
 
     @Then("^Budżet powinien posiadać (\\d+) kategorię wydatku$")
