@@ -7,21 +7,22 @@ import java.util.*;
  * Created by aliberadzki on 2016-07-14.
  */
 public class ExpenseCategory implements CashFlowCategory {
-    private Collection<CashFlow> cf;
     private Map<String, Double> expectedBalancesOverridesForMonth;
     private Map<String, Double> expectedBalancesOverridesSinceMonth;
     private List<Operation> expenses;
+    private List<CashFlowCategory> subcatgories;
 
     private String effectiveSince;
-    private double basicAmount = 0.0;
+    private Double basicAmount = 0.0;
 
     private String name;
+    private String id;
 
-    public ExpenseCategory(String name, double expectedAmount) {
-        this(name, expectedAmount, null);
+    public ExpenseCategory(String id, String name, Double expectedAmount) {
+        this(id, name, expectedAmount, null);
     }
 
-    public ExpenseCategory(String name, double expectedAmount, String date) {
+    public ExpenseCategory(String id, String name, Double expectedAmount, String date) {
         if(date == null) {
             int month = LocalDate.now().getMonth().getValue();
             date = String.valueOf(LocalDate.now().getYear()) + (month < 10 ? "0" + month : month);
@@ -29,11 +30,14 @@ public class ExpenseCategory implements CashFlowCategory {
         expectedBalancesOverridesForMonth = new HashMap<>();
         expectedBalancesOverridesSinceMonth = new HashMap<>();
         expenses = new ArrayList<>();
+        subcatgories = new ArrayList<>();
 
         this.name = name;
+        this.id = id;
         effectiveSince = date;
-        basicAmount = expectedAmount;
+        basicAmount = expectedAmount == null ? 0.0 : expectedAmount;
     }
+
 
     private String getOverrideSinceMonthFor(String date) {
         return expectedBalancesOverridesSinceMonth.keySet().stream()
@@ -44,15 +48,22 @@ public class ExpenseCategory implements CashFlowCategory {
 
     @Override
     public Double getExpectedBalanceAt(String date) {
+        Double fromSubcategories = 0.0;
+        if(subcatgories.size() > 0) {
+            fromSubcategories =
+                    subcatgories.stream()
+                            .reduce(0.0, (sum, c) -> sum += c.getExpectedBalanceAt(date), (sum1, sum2) -> sum1 + sum2);
+        }
+
         if(expectedBalancesOverridesForMonth.containsKey(date))
-            return expectedBalancesOverridesForMonth.get(date);
+            return Math.max(expectedBalancesOverridesForMonth.get(date), fromSubcategories);
 
         String key = getOverrideSinceMonthFor(date);
-        if(key != "") return expectedBalancesOverridesSinceMonth.get(key);
+        if(key != "") return Math.max(expectedBalancesOverridesSinceMonth.get(key), fromSubcategories);
 
-        if(effectiveSince.compareTo(date) < 1) return basicAmount;
+        if(effectiveSince.compareTo(date) < 1) return Math.max(basicAmount, fromSubcategories);
 
-        return 0.0;
+        return Math.max(0.0, fromSubcategories);
     }
 
     @Override
@@ -71,7 +82,15 @@ public class ExpenseCategory implements CashFlowCategory {
     }
 
     @Override
-    public void addOperation(Operation operation) {
+    public void addOperation(Operation operation) throws Exception {
+        if(this.getExpectedBalanceAt(operation.getDate()) - this.getBalanceAt(operation.getDate()) - operation.getAmount() < 0) {
+            throw new Exception("Przekroczono przewidywane wydatki");
+        }
+        this.expenses.add(operation);
+    }
+
+    @Override
+    public void forceAddOperation(Operation operation) {
         this.expenses.add(operation);
     }
 
@@ -80,5 +99,18 @@ public class ExpenseCategory implements CashFlowCategory {
         return this.expenses.stream()
                 .filter(o -> o.getDate().startsWith(date))
                 .mapToDouble(o-> o.getAmount()).sum();
+    }
+
+    @Override
+    public void addSubCategory(CashFlowCategory subcategory) throws Exception {
+        boolean foundCfc = this.subcatgories.stream().anyMatch(cfc -> cfc.getName().equals(subcategory.getName()));
+
+        if(foundCfc) throw new Exception("Już istnieje podkategoria o nazwie: " + subcategory.getName());
+        subcatgories.add(subcategory);
+    }
+
+    @Override
+    public String getId() {
+        return this.id;
     }
 }

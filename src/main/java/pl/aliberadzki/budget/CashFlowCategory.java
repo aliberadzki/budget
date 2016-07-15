@@ -1,5 +1,7 @@
 package pl.aliberadzki.budget;
 
+import java.util.Objects;
+
 /**
  * Created by aliberadzki on 2016-07-14.
  */
@@ -12,7 +14,13 @@ public interface CashFlowCategory {
 
     String getName();
 
-    void addOperation(Operation operation);
+    void addOperation(Operation operation) throws Exception;
+
+    void forceAddOperation(Operation operation);
 
     double getBalanceAt(String date);
+
+    void addSubCategory(CashFlowCategory subcategory) throws Exception;
+
+    String getId();
 }
