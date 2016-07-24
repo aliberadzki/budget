@@ -7,25 +7,25 @@ import java.util.*;
  * Created by aliberadzki on 2016-07-14.
  */
 public class ExpenseCategory implements CashFlowCategory {
-    private Map<String, Double> expectedBalancesOverridesForMonth;
-    private Map<String, Double> expectedBalancesOverridesSinceMonth;
+    private Map<DateRange, Double> expectedBalancesOverridesForMonth;
+    private Map<DateRange, Double> expectedBalancesOverridesSinceMonth;
     private List<Operation> expenses;
     private List<CashFlowCategory> subcatgories;
 
-    private String effectiveSince;
+    private DateRange effectiveSince;
     private Double basicAmount = 0.0;
 
     private String name;
     private String id;
 
-    public ExpenseCategory(String id, String name, Double expectedAmount) {
+    public ExpenseCategory(String id, String name, Double expectedAmount) throws Exception {
         this(id, name, expectedAmount, null);
     }
 
-    public ExpenseCategory(String id, String name, Double expectedAmount, String date) {
+    public ExpenseCategory(String id, String name, Double expectedAmount, DateRange date) throws Exception {
         if(date == null) {
             int month = LocalDate.now().getMonth().getValue();
-            date = String.valueOf(LocalDate.now().getYear()) + (month < 10 ? "0" + month : month);
+            date = new DateRangeImpl(LocalDate.now().getYear(), month);
         }
         expectedBalancesOverridesForMonth = new HashMap<>();
         expectedBalancesOverridesSinceMonth = new HashMap<>();
@@ -39,15 +39,15 @@ public class ExpenseCategory implements CashFlowCategory {
     }
 
 
-    private String getOverrideSinceMonthFor(String date) {
+    private DateRange getOverrideSinceMonthFor(DateRange date) {
         return expectedBalancesOverridesSinceMonth.keySet().stream()
                 .filter(s -> s.compareTo(date) < 1)
-                .max(String::compareTo)
-                .orElse("");
+                .max(DateRange::compareTo)
+                .orElse(null);
     }
 
     @Override
-    public Double getExpectedBalanceAt(String date) {
+    public Double getExpectedBalanceAt(DateRange date) {
         Double fromSubcategories = 0.0;
         if(subcatgories.size() > 0) {
             fromSubcategories =
@@ -58,8 +58,8 @@ public class ExpenseCategory implements CashFlowCategory {
         if(expectedBalancesOverridesForMonth.containsKey(date))
             return Math.max(expectedBalancesOverridesForMonth.get(date), fromSubcategories);
 
-        String key = getOverrideSinceMonthFor(date);
-        if(key != "") return Math.max(expectedBalancesOverridesSinceMonth.get(key), fromSubcategories);
+        DateRange key = getOverrideSinceMonthFor(date);
+        if(key != null) return Math.max(expectedBalancesOverridesSinceMonth.get(key), fromSubcategories);
 
         if(effectiveSince.compareTo(date) < 1) return Math.max(basicAmount, fromSubcategories);
 
@@ -67,12 +67,12 @@ public class ExpenseCategory implements CashFlowCategory {
     }
 
     @Override
-    public void setNewExpectedAmountFrom(String date, double amount) {
+    public void setNewExpectedAmountFrom(DateRange date, double amount) {
         this.expectedBalancesOverridesSinceMonth.put(date,amount);
     }
 
     @Override
-    public void setNewExpectedAmountFor(String date, double amount) {
+    public void setNewExpectedAmountFor(DateRange date, double amount) {
         this.expectedBalancesOverridesForMonth.put(date,amount);
     }
 
@@ -95,9 +95,9 @@ public class ExpenseCategory implements CashFlowCategory {
     }
 
     @Override
-    public double getBalanceAt(String date) {
+    public double getBalanceAt(DateRange date) {
         return this.expenses.stream()
-                .filter(o -> o.getDate().startsWith(date))
+                .filter(o -> o.getDate().isIncludedIn(date))
                 .mapToDouble(o-> o.getAmount()).sum();
     }
 

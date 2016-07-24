@@ -1,6 +1,5 @@
 package pl.aliberadzki.budget;
 
-import javafx.util.Pair;
 
 import java.util.*;
 
@@ -21,29 +20,29 @@ public class BaseBudget {
         this.flatCategoriesMap = new HashMap<>();
 
     }
-    public double monthlyExpenses(String date) {
+    public double monthlyExpenses(DateRange date) {
         return 0;
     }
 
-    public double monthlyInvestments(String date) {
+    public double monthlyInvestments(DateRange date) {
         return 0;
     }
 
-    public double monthlyIncomes(String date) {
+    public double monthlyIncomes(DateRange date) {
         return 0;
     }
 
-    public double plannedMonthlyExpenses(String date) {
+    public double plannedMonthlyExpenses(DateRange date) {
         return expenseCategories.stream()
                 .filter(c -> c instanceof ExpenseCategory)
                 .reduce(0.0, (sum, c) -> sum += c.getExpectedBalanceAt(date), (sum1, sum2) -> sum1 + sum2);
     }
 
-    public double plannedMonthlyInvestments(String date) {
+    public double plannedMonthlyInvestments(DateRange date) {
         return 0;
     }
 
-    public double plannedMonthlyIncomes(String date) {
+    public double plannedMonthlyIncomes(DateRange date) {
         return 0;
     }
 
@@ -66,15 +65,15 @@ public class BaseBudget {
         flatCategoriesMap.put(category.getId(), category);
     }
 
-    public void addExpense(String categoryId, double amount, String date, String description) throws Exception {
+    public void addExpense(String categoryId, double amount, DateRange date, String description) throws Exception {
         performAddExpense(categoryId, amount, date, description, false);
     }
 
-    public void forceAddExpense(String categoryId, double amount, String date, String description) throws Exception {
+    public void forceAddExpense(String categoryId, double amount, DateRange date, String description) throws Exception {
         performAddExpense(categoryId, amount, date, description, true);
     }
 
-    private void performAddExpense(String categoryId, double amount, String date, String description, boolean force) throws Exception {
+    private void performAddExpense(String categoryId, double amount, DateRange date, String description, boolean force) throws Exception {
         CashFlowCategory cfc = getCategory(categoryId, expenseCategories);
         if(cfc == null) throw new Exception("Nie ma kategorii o id: " + categoryId);
 
@@ -87,11 +86,11 @@ public class BaseBudget {
         }
     }
 
-    public double expensesSpentPercentage(String date) {
+    public double expensesSpentPercentage(DateRange date) {
         return calculateSpentPercentage(this.expenseCategories, date);
     }
 
-    private double calculateSpentPercentage(List<CashFlowCategory> categories, String date) {
+    private double calculateSpentPercentage(List<CashFlowCategory> categories, DateRange date) {
         double expected = categories.stream()
                 .mapToDouble(ec -> ec.getExpectedBalanceAt(date))
                 .sum();
@@ -113,4 +112,13 @@ public class BaseBudget {
         return flatCategoriesMap.containsKey(categoryId);
     }
 
+    public void addCyclicExpense(String categoryId, double amount, Integer cycle, DateRange startingFrom, String description) {
+
+        CashFlowCategory cfc = this.getCategory(categoryId, expenseCategories);
+
+        for(int i=0; i <10 ; i++) {
+            cfc.setNewExpectedAmountFor(startingFrom, amount);
+            startingFrom.increment(cycle);
+        }
+    }
 }

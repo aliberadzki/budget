@@ -5,6 +5,6 @@ package pl.aliberadzki.budget;
  */
 public interface Operation {
     double getAmount();
-    String getDate();
+    DateRange getDate();
     String getDescription();
 }

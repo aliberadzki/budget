@@ -1,16 +1,14 @@
 package pl.aliberadzki.budget;
 
-import java.util.Objects;
-
 /**
  * Created by aliberadzki on 2016-07-14.
  */
 public interface CashFlowCategory {
-    Double getExpectedBalanceAt(String date);
+    Double getExpectedBalanceAt(DateRange date);
 
-    void setNewExpectedAmountFrom(String date, double amount);
+    void setNewExpectedAmountFrom(DateRange date, double amount);
 
-    void setNewExpectedAmountFor(String date, double amount);
+    void setNewExpectedAmountFor(DateRange date, double amount);
 
     String getName();
 
@@ -18,7 +16,7 @@ public interface CashFlowCategory {
 
     void forceAddOperation(Operation operation);
 
-    double getBalanceAt(String date);
+    double getBalanceAt(DateRange date);
 
     void addSubCategory(CashFlowCategory subcategory) throws Exception;
 

@@ -5,10 +5,11 @@ package pl.aliberadzki.budget;
  */
 public class Expense implements Operation {
     private double amount;
-    private String date;
+    private DateRange date;
     private String description;
 
-    public Expense(double amount, String date, String description) {
+
+    public Expense(double amount, DateRange date, String description) {
         this.amount = amount;
         this.date = date;
         this.description = description;
@@ -18,7 +19,7 @@ public class Expense implements Operation {
         return amount;
     }
 
-    public String getDate() {
+    public DateRange getDate() {
         return date;
     }
 
