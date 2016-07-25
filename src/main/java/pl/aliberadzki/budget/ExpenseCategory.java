@@ -16,13 +16,13 @@ public class ExpenseCategory implements CashFlowCategory {
     private Double basicAmount = 0.0;
 
     private String name;
-    private String id;
+    private int id;
 
-    public ExpenseCategory(String id, String name, Double expectedAmount) throws Exception {
+    public ExpenseCategory(int id, String name, Double expectedAmount) throws Exception {
         this(id, name, expectedAmount, null);
     }
 
-    public ExpenseCategory(String id, String name, Double expectedAmount, DateRange date) throws Exception {
+    public ExpenseCategory(int id, String name, Double expectedAmount, DateRange date) throws Exception {
         if(date == null) {
             int month = LocalDate.now().getMonth().getValue();
             date = new DateRangeImpl(LocalDate.now().getYear(), month);
@@ -110,7 +110,7 @@ public class ExpenseCategory implements CashFlowCategory {
     }
 
     @Override
-    public String getId() {
+    public int getId() {
         return this.id;
     }
 }

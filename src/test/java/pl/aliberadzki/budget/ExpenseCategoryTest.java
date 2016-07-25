@@ -11,13 +11,13 @@ public class ExpenseCategoryTest {
 
     @Test
     public void testGetExpectedBalanceAt() throws Exception {
-        CashFlowCategory cfc = new ExpenseCategory("123", "nazwa", 123.45);
+        CashFlowCategory cfc = new ExpenseCategory(123, "nazwa", 123.45);
         assertEquals(123.45, cfc.getExpectedBalanceAt(new DateRangeImpl()), 0.01);
     }
 
     @Test
     public void testSetNewExpectedAmountFrom() throws Exception {
-        CashFlowCategory cfc = new ExpenseCategory("123", "nazwa", 123.45);
+        CashFlowCategory cfc = new ExpenseCategory(123, "nazwa", 123.45);
         cfc.setNewExpectedAmountFrom(new DateRangeImpl("201807"), 345.67);
         assertEquals(123.45, cfc.getExpectedBalanceAt(new DateRangeImpl()), 0.01);
     }
@@ -54,7 +54,7 @@ public class ExpenseCategoryTest {
 
     @Test
     public void testGetId() throws Exception {
-        String id = "123";
+        int id = 123;
         CashFlowCategory cfc = new ExpenseCategory(id, "nazwa", 21.0);
         assertEquals(id, cfc.getId());
     }

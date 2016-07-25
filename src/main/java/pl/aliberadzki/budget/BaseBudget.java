@@ -6,12 +6,15 @@ import java.util.*;
 /**
  * Created by aliberadzki on 2016-07-14.
  */
-public class BaseBudget {
+public class BaseBudget implements Budget{
+    private int id;
+    private String name;
+
     private List<CashFlowCategory> expenseCategories;
     private List<CashFlowCategory> investmentCategories;
     private List<CashFlowCategory> incomeCategories;
 
-    private Map<String, CashFlowCategory> flatCategoriesMap;
+    private Map<Integer, CashFlowCategory> flatCategoriesMap;
 
     public BaseBudget() {
         this.expenseCategories = new ArrayList<>();
@@ -20,6 +23,13 @@ public class BaseBudget {
         this.flatCategoriesMap = new HashMap<>();
 
     }
+
+    public BaseBudget(int budgetId, String budgetName) {
+        this();
+        this.id = budgetId;
+        this.name = budgetName;
+    }
+
     public double monthlyExpenses(DateRange date) {
         return 0;
     }
@@ -32,6 +42,7 @@ public class BaseBudget {
         return 0;
     }
 
+    @Override
     public double plannedMonthlyExpenses(DateRange date) {
         return expenseCategories.stream()
                 .filter(c -> c instanceof ExpenseCategory)
@@ -46,7 +57,7 @@ public class BaseBudget {
         return 0;
     }
 
-    public void addExpenseCategory(String masterId, CashFlowCategory slave) throws Exception {
+    public void addExpenseCategory(int masterId, CashFlowCategory slave) throws Exception {
         if(existsCategory(slave.getId())) {
             throw new Exception("Już istnieje kategoria o id: " + slave.getId());
         }
@@ -60,20 +71,32 @@ public class BaseBudget {
         flatCategoriesMap.put(slave.getId(), slave);
     }
 
-    public void addExpenseCategory(CashFlowCategory category) {
+    @Override
+    public void addCategory(CashFlowCategory category) {
         this.expenseCategories.add(category);
         flatCategoriesMap.put(category.getId(), category);
     }
 
-    public void addExpense(String categoryId, double amount, DateRange date, String description) throws Exception {
+    @Override
+    public CashFlowCategory getCategory(int categoryId) {
+        //TODO : one collection for all categories?
+        CashFlowCategory ecfc = expenseCategories.stream().filter(c -> c.getId() == categoryId).findFirst().orElse(null);
+        if(ecfc != null) return ecfc;
+        CashFlowCategory icfc = investmentCategories.stream().filter(c -> c.getId() == categoryId).findFirst().orElse(null);
+        if(icfc != null) return icfc;
+        CashFlowCategory inccfc = incomeCategories.stream().filter(c -> c.getId() == categoryId).findFirst().orElse(null);
+        return inccfc;
+    }
+
+    public void addExpense(int categoryId, double amount, DateRange date, String description) throws Exception {
         performAddExpense(categoryId, amount, date, description, false);
     }
 
-    public void forceAddExpense(String categoryId, double amount, DateRange date, String description) throws Exception {
+    public void forceAddExpense(int categoryId, double amount, DateRange date, String description) throws Exception {
         performAddExpense(categoryId, amount, date, description, true);
     }
 
-    private void performAddExpense(String categoryId, double amount, DateRange date, String description, boolean force) throws Exception {
+    private void performAddExpense(int categoryId, double amount, DateRange date, String description, boolean force) throws Exception {
         CashFlowCategory cfc = getCategory(categoryId, expenseCategories);
         if(cfc == null) throw new Exception("Nie ma kategorii o id: " + categoryId);
 
@@ -101,14 +124,14 @@ public class BaseBudget {
         return expected == 0.0 ? 0 : actual/expected;
     }
 
-    private CashFlowCategory getCategory(String categoryId, List<CashFlowCategory> categories) {
+    private CashFlowCategory getCategory(int categoryId, List<CashFlowCategory> categories) {
         return flatCategoriesMap.get(categoryId);
     }
-    private boolean existsCategory(String categoryId) {
+    private boolean existsCategory(int categoryId) {
         return flatCategoriesMap.containsKey(categoryId);
     }
 
-    public void addCyclicExpense(String categoryId, double amount, Integer cycle, DateRange startingFrom, String description) throws Exception {
+    public void addCyclicExpense(int categoryId, double amount, Integer cycle, DateRange startingFrom, String description) throws Exception {
 
         CashFlowCategory cfc = this.getCategory(categoryId, expenseCategories);
 
@@ -116,5 +139,10 @@ public class BaseBudget {
             cfc.setNewExpectedAmountFor(startingFrom, amount);
             startingFrom = startingFrom.increment(cycle);
         }
+    }
+
+    @Override
+    public Integer getId() {
+        return this.id;
     }
 }

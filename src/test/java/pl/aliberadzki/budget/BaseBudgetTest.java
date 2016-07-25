@@ -10,9 +10,17 @@ import static org.junit.Assert.*;
  */
 public class BaseBudgetTest {
 
+
+
     @Test
     public void testCreatingEmptyBudget() throws Exception {
-        BaseBudget b = new BaseBudget();
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
         assertNotNull(b);
         assertEquals(0.0, b.monthlyExpenses(new DateRangeImpl("201607")), 0.01);
         assertEquals(0.0, b.monthlyInvestments(new DateRangeImpl("201607")), 0.01);
@@ -24,10 +32,20 @@ public class BaseBudgetTest {
 
     @Test
     public void testAddingSingleExpenseCategory() throws Exception {
-        BaseBudget b = new BaseBudget();
-        String catName = "Jedzenie";
-        CashFlowCategory cfc = new ExpenseCategory("1", catName, 123.45, new DateRangeImpl("201607"));
-        b.addExpenseCategory(cfc);
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+        int expenseCategoryId = 11;
+        String expenseCategoryName = "Jedzenie";
+        Double plannedExpenses = 123.45;
+        DateRange expenseCategoryStartingFromDate = new DateRangeImpl("201607");
+
+        t = new AddExpenseCategoryTransaction(budgetId, expenseCategoryId, expenseCategoryName, plannedExpenses, expenseCategoryStartingFromDate);
+        t.execute();
 
         assertEquals(  0.00, b.plannedMonthlyExpenses(new DateRangeImpl("201606")), 0.01);
         assertEquals(123.45, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.01);
@@ -36,11 +54,25 @@ public class BaseBudgetTest {
 
     @Test
     public void testAddingTwoPeriodsToSingleExpenseCategory() throws Exception {
-        BaseBudget b = new BaseBudget();
-        String catName = "Jedzenie";
-        CashFlowCategory cfc = new ExpenseCategory("1", catName, 123.45, new DateRangeImpl("201607"));
-        b.addExpenseCategory(cfc);
-        cfc.setNewExpectedAmountFrom(new DateRangeImpl("201609"), 234.56);
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+        int expenseCategoryId = 11;
+        String expenseCategoryName = "Jedzenie";
+        Double plannedExpenses = 123.45;
+        DateRange expenseCategoryStartingFromDate = new DateRangeImpl("201607");
+
+        t = new AddExpenseCategoryTransaction(budgetId, expenseCategoryId, expenseCategoryName, plannedExpenses, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new SetNewExpectedAmountFromDateTransaction(budgetId, expenseCategoryId, new DateRangeImpl("201609"), 234.56);
+        t.execute();
+
+        //cfc.setNewExpectedAmountFrom(new DateRangeImpl("201609"), 234.56);
 
         assertEquals(  0.00, b.plannedMonthlyExpenses(new DateRangeImpl("201606")), 0.01);
         assertEquals(123.45, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.01);
@@ -54,7 +86,7 @@ public class BaseBudgetTest {
 
         BaseBudget b = new BaseBudget();
         String catName = "Jedzenie";
-        CashFlowCategory cfc = new ExpenseCategory("1", catName, 123.45, new DateRangeImpl("201607"));
+        CashFlowCategory cfc = new ExpenseCategory(1, catName, 123.45, new DateRangeImpl("201607"));
         b.addExpenseCategory(cfc);
         cfc.setNewExpectedAmountFor(new DateRangeImpl("201609"), 234.56);
 
@@ -69,7 +101,7 @@ public class BaseBudgetTest {
     public void testAddingTwoPeriodsToSingleExpenseCategoryWithOneExceptionalMonth() throws Exception {
         BaseBudget b = new BaseBudget();
         String catName = "Jedzenie";
-        CashFlowCategory cfc = new ExpenseCategory("1", catName, 123.45, new DateRangeImpl("201607"));
+        CashFlowCategory cfc = new ExpenseCategory(1, catName, 123.45, new DateRangeImpl("201607"));
         b.addExpenseCategory(cfc);
         cfc.setNewExpectedAmountFrom(new DateRangeImpl("201609"), 234.56);
         cfc.setNewExpectedAmountFor(new DateRangeImpl("201610"), 345.67);
@@ -88,12 +120,12 @@ public class BaseBudgetTest {
     public void testAddingThreePeriodsToSingleExpenseCategory() throws Exception {
         BaseBudget b = new BaseBudget();
         String catName = "Jedzenie";
-        CashFlowCategory cfc = new ExpenseCategory("1", catName, 123.45, new DateRangeImpl("201607"));
+        CashFlowCategory cfc = new ExpenseCategory(1, catName, 123.45, new DateRangeImpl("201607"));
         b.addExpenseCategory(cfc);
         cfc.setNewExpectedAmountFrom(new DateRangeImpl("201609"), 234.56);
         cfc.setNewExpectedAmountFrom(new DateRangeImpl("201612"), 555.66);
 
-        assertEquals(  0.00, b.plannedMonthlyExpenses(new DateRangeImpl("201606")), 0.01);
+        assertEquals(0.00, b.plannedMonthlyExpenses(new DateRangeImpl("201606")), 0.01);
         assertEquals(123.45, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.01);
         assertEquals(123.45, b.plannedMonthlyExpenses(new DateRangeImpl("201608")), 0.01);
         assertEquals(234.56, b.plannedMonthlyExpenses(new DateRangeImpl("201609")), 0.01);
@@ -107,9 +139,9 @@ public class BaseBudgetTest {
     @Test
     public void testAddingExpenseCategoryWithSubcategories() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory("1", "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory("2", "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave2 = new ExpenseCategory("3", "Jedzenie na miescie", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave2 = new ExpenseCategory(3, "Jedzenie na miescie", 1000.0, new DateRangeImpl("201607"));
         b.addExpenseCategory(master);
         b.addExpenseCategory(master.getId(), slave1);
         b.addExpenseCategory(master.getId(), slave2);
@@ -120,13 +152,13 @@ public class BaseBudgetTest {
     @Test
     public void testAddingExpenseCategoryWithSubcategoriesWithSubcategories() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory("1", "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory("2", "Jedzenie w domu", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave11 = new ExpenseCategory("3", "Biedronka", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave12 = new ExpenseCategory("4", "Delikatesy", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave2 = new ExpenseCategory("5", "Jedzenie na miescie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave21 = new ExpenseCategory("6", "Knajpy", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave22 = new ExpenseCategory("7", "Pizza na dowoz", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave11 = new ExpenseCategory(3, "Biedronka", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave12 = new ExpenseCategory(4, "Delikatesy", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave2 = new ExpenseCategory(5, "Jedzenie na miescie", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave21 = new ExpenseCategory(6, "Knajpy", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave22 = new ExpenseCategory(7, "Pizza na dowoz", 1000.0, new DateRangeImpl("201607"));
         b.addExpenseCategory(master);
         b.addExpenseCategory(master.getId(), slave1);
         b.addExpenseCategory(slave1.getId(), slave11);
@@ -141,13 +173,13 @@ public class BaseBudgetTest {
     @Test(expected = Exception.class)
     public void testAddingSubcategoriesWithConflictingNames() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory("1", "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory("2", "Jedzenie w domu", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave11 = new ExpenseCategory("3", "Biedronka", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave12 = new ExpenseCategory("4", "Delikatesy", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave2 = new ExpenseCategory("5", "Jedzenie na miescie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave21 = new ExpenseCategory("6", "Knajpy", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave22 = new ExpenseCategory("4", "Pizza na dowoz", 1000.0, new DateRangeImpl("201607")); //conflicting id!
+        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave11 = new ExpenseCategory(3, "Biedronka", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave12 = new ExpenseCategory(4, "Delikatesy", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave2 = new ExpenseCategory(5, "Jedzenie na miescie", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave21 = new ExpenseCategory(6, "Knajpy", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave22 = new ExpenseCategory(4, "Pizza na dowoz", 1000.0, new DateRangeImpl("201607")); //conflicting id!
         b.addExpenseCategory(master);
         b.addExpenseCategory(master.getId(), slave1);
         b.addExpenseCategory(slave1.getId(), slave11);
@@ -160,9 +192,9 @@ public class BaseBudgetTest {
     @Test(expected = Exception.class)
     public void testAddingExpenseCategoryWithExistingSubcategoryOnThisLevel() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory("1", "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory("2", "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave2 = new ExpenseCategory("3", "Jedzenie w domu", 1200.0, new DateRangeImpl("201607"));
+        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave2 = new ExpenseCategory(3, "Jedzenie w domu", 1200.0, new DateRangeImpl("201607"));
         b.addExpenseCategory(master);
         b.addExpenseCategory(master.getId(), slave1);
         b.addExpenseCategory(master.getId(), slave2); // the same name on the same level, exception
@@ -171,12 +203,12 @@ public class BaseBudgetTest {
     @Test
     public void testAddingExpenseCategoryWithExistingSubcategoryOnAnotherLevel() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory master1 = new ExpenseCategory("1", "Ja", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave11 = new ExpenseCategory("2", "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave12 = new ExpenseCategory("3", "Jedzenie na miescie", 1200.0, new DateRangeImpl("201607"));
-        CashFlowCategory master2 = new ExpenseCategory("4", "Rodzice", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave21 = new ExpenseCategory("5", "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave22 = new ExpenseCategory("6", "Jedzenie na miescie", 1200.0, new DateRangeImpl("201607"));
+        CashFlowCategory master1 = new ExpenseCategory(1, "Ja", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave11 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave12 = new ExpenseCategory(3, "Jedzenie na miescie", 1200.0, new DateRangeImpl("201607"));
+        CashFlowCategory master2 = new ExpenseCategory(4, "Rodzice", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave21 = new ExpenseCategory(5, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory slave22 = new ExpenseCategory(6, "Jedzenie na miescie", 1200.0, new DateRangeImpl("201607"));
         b.addExpenseCategory(master1);
         b.addExpenseCategory(master2);
         b.addExpenseCategory(master1.getId(), slave11);
@@ -190,8 +222,8 @@ public class BaseBudgetTest {
     @Test(expected = Exception.class)
     public void testAddingSubcategoryToNonExistentExpenseCategory() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory("1", "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory("2", "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
+        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
 
         b.addExpenseCategory(master.getId(), slave1); // exception expected
     }
@@ -199,9 +231,9 @@ public class BaseBudgetTest {
     @Test
     public void testAddingExpenseCategoryAndExpenses() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory cfc = new ExpenseCategory("1", "Jedzenie", 200.00, new DateRangeImpl("201607"));
+        CashFlowCategory cfc = new ExpenseCategory(1, "Jedzenie", 200.00, new DateRangeImpl("201607"));
         b.addExpenseCategory(cfc);
-        b.addExpense("1", 100.0, new DateRangeImpl("20160714"), "Parówki");
+        b.addExpense(1, 100.0, new DateRangeImpl("20160714"), "Parówki");
 
         assertEquals(0.5, b.expensesSpentPercentage(new DateRangeImpl("201607")), 0.001);
     }
@@ -210,9 +242,9 @@ public class BaseBudgetTest {
     public void testAddingExpenseExceedingPlannedAmount() throws Exception {
         BaseBudget b = new BaseBudget();
         String catName = "Jedzenie";
-        CashFlowCategory cfc = new ExpenseCategory("1", catName, 200.00, new DateRangeImpl("201607"));
+        CashFlowCategory cfc = new ExpenseCategory(1, catName, 200.00, new DateRangeImpl("201607"));
         b.addExpenseCategory(cfc);
-        b.addExpense(catName, 300.0, new DateRangeImpl("20160714"), "Parówki");
+        b.addExpense(1, 300.0, new DateRangeImpl("20160714"), "Parówki");
 
         assertEquals(1.5, b.expensesSpentPercentage(new DateRangeImpl("201607")), 0.001);
     }
@@ -220,9 +252,9 @@ public class BaseBudgetTest {
     @Test
     public void testForceAddingExpenseExceedingPlannedAmount() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory cfc = new ExpenseCategory("1", "Jedzenie", 200.00, new DateRangeImpl("201607"));
+        CashFlowCategory cfc = new ExpenseCategory(1, "Jedzenie", 200.00, new DateRangeImpl("201607"));
         b.addExpenseCategory(cfc);
-        b.forceAddExpense("1", 300.0, new DateRangeImpl("20160714"), "Parówki");
+        b.forceAddExpense(1, 300.0, new DateRangeImpl("20160714"), "Parówki");
 
         assertEquals(1.5, b.expensesSpentPercentage(new DateRangeImpl("201607")), 0.001);
     }
@@ -231,9 +263,9 @@ public class BaseBudgetTest {
     public void testAddingExpenseToNonExistentCategory() throws Exception {
 
         BaseBudget b = new BaseBudget();
-        CashFlowCategory cfc = new ExpenseCategory("1", "Jedzenie", 200.00, new DateRangeImpl("201607"));
+        CashFlowCategory cfc = new ExpenseCategory(1, "Jedzenie", 200.00, new DateRangeImpl("201607"));
         b.addExpenseCategory(cfc);
-        b.addExpense("2", 100.0, new DateRangeImpl("20160714"), "Parówki");
+        b.addExpense(1, 100.0, new DateRangeImpl("20160714"), "Parówki");
 
         assertEquals(0.5, b.expensesSpentPercentage(new DateRangeImpl("201607")), 0.001);
     }
@@ -241,9 +273,9 @@ public class BaseBudgetTest {
     @Test
     public void testAddingOnceAYearExpense() throws Exception {
         BaseBudget b = new BaseBudget();
-        CashFlowCategory cfc = new ExpenseCategory("1", "Samochód", 500.00);
+        CashFlowCategory cfc = new ExpenseCategory(1, "Samochód", 500.00);
         b.addExpenseCategory(cfc);
-        b.addCyclicExpense("1", 1600.00, DateRange.YEARLY, new DateRangeImpl("201607"), "Ubezpieczenie AC/OC");
+        b.addCyclicExpense(1, 1600.00, DateRange.YEARLY, new DateRangeImpl("201607"), "Ubezpieczenie AC/OC");
 
         assertEquals(1600.00, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.01);
         assertEquals(1600.00, b.plannedMonthlyExpenses(new DateRangeImpl("201707")), 0.01);
