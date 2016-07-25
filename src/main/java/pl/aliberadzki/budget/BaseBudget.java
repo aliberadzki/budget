@@ -103,22 +103,18 @@ public class BaseBudget {
 
     private CashFlowCategory getCategory(String categoryId, List<CashFlowCategory> categories) {
         return flatCategoriesMap.get(categoryId);
-        /*return categories.stream()
-                .filter(ec -> ec.getId().equals(categoryId))
-                .findFirst()
-                .orElse(null);*/
     }
     private boolean existsCategory(String categoryId) {
         return flatCategoriesMap.containsKey(categoryId);
     }
 
-    public void addCyclicExpense(String categoryId, double amount, Integer cycle, DateRange startingFrom, String description) {
+    public void addCyclicExpense(String categoryId, double amount, Integer cycle, DateRange startingFrom, String description) throws Exception {
 
         CashFlowCategory cfc = this.getCategory(categoryId, expenseCategories);
 
         for(int i=0; i <10 ; i++) {
             cfc.setNewExpectedAmountFor(startingFrom, amount);
-            startingFrom.increment(cycle);
+            startingFrom = startingFrom.increment(cycle);
         }
     }
 }

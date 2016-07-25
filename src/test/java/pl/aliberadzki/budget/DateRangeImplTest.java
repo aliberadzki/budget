@@ -14,14 +14,22 @@ public class DateRangeImplTest {
     public void testSimpleIncrement() throws Exception {
         DateRange dr = new DateRangeImpl("20170601");
 
-        dr.increment(DateRange.MONTHLY);
+        dr = dr.increment(DateRange.MONTHLY);
         assertEquals((new DateRangeImpl("20170701")).toString(), dr.toString());
-        dr.increment(DateRange.DAILY);
+        dr = dr.increment(DateRange.DAILY);
         assertEquals((new DateRangeImpl("20170702")).toString(), dr.toString());
-        dr.increment(DateRange.YEARLY);
+        dr = dr.increment(DateRange.YEARLY);
         assertEquals((new DateRangeImpl("20180702")).toString(), dr.toString());
-        dr.increment(DateRange.WEEKLY);
+        dr = dr.increment(DateRange.WEEKLY);
         assertEquals((new DateRangeImpl("20180709")).toString(), dr.toString());
+    }
+
+    @Test
+    public void testEqualsAndHashCode() throws Exception {
+        DateRange dr = new DateRangeImpl("201607");
+        DateRange dr2 = new DateRangeImpl("201707");
+        assertEquals(dr2, dr.increment(DateRange.YEARLY));
+        assertEquals(dr2.hashCode(), dr.increment(DateRange.YEARLY).hashCode());
     }
 
     @Test

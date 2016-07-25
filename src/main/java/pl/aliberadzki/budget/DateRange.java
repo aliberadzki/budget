@@ -4,12 +4,12 @@ package pl.aliberadzki.budget;
  * Created by aliberadzki on 24.07.16.
  */
 public interface DateRange {
-    Integer YEARLY = 1;
-    Integer MONTHLY = 2;
-    Integer WEEKLY = 3;
-    Integer DAILY = 4;
+    Integer YEARLY = 4;
+    Integer MONTHLY = 3;
+    Integer WEEKLY = 2;
+    Integer DAILY = 1;
 
-    DateRange increment(Integer cycle);
+    DateRange increment(Integer cycle) throws Exception;
     Integer getYear();
     Integer getMonth();
     Integer getDay();
