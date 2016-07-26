@@ -56,7 +56,7 @@ public class DummyDatabase implements Datasource {
                 .map(e -> {
                     Integer parent = categoriesToParents.get(e.getValue().getId());
                     Integer budget = categoriesToBudgets.get(e.getValue().getId());
-                    return budget == budgetId && parent == category.getMasterCategoryId();
+                    return budget != null && parent != null && budget == budgetId && parent == category.getMasterCategoryId();
                 }
                 ).anyMatch(f -> f);
         if(doThrow) throw new Exception("There is already category with this name on this level");
