@@ -23,8 +23,8 @@ public class AddExpenseCategoryTransaction implements Transaction {
         try {
             CashFlowCategory ec = new ExpenseCategory(expenseCategoryId, expenseCategoryName, plannedAmount, expenseCategoryStartingFromDate);
             Budget b = DummyDatabase.instance().getBudget(budgetId);
-            b.addExpenseCategory(ec);
-            DummyDatabase.instance().addCategory(ec);
+            b.addCategory(ec);
+            DummyDatabase.instance().addCategory(budgetId, ec);
 
         } catch (Exception e) {
             e.printStackTrace();
