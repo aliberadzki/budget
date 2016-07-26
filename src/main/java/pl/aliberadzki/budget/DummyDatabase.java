@@ -40,7 +40,7 @@ public class DummyDatabase implements Datasource {
     }
 
     @Override
-    public void addCategory(int budgetId, CashFlowCategory category) {
+    public void addCategory(int budgetId, CashFlowCategory category) throws Exception {
         this.allBudgets.get(budgetId).addCategory(category);
     }
 }

@@ -72,9 +72,19 @@ public class BaseBudget implements Budget{
     }
 
     @Override
-    public void addCategory(CashFlowCategory category) {
-        this.expenseCategories.add(category);
+    public void addCategory(CashFlowCategory category) throws Exception {
+        List<CashFlowCategory> list = null;
+        if(category instanceof ExpenseCategory) {
+            list = this.expenseCategories;
+        }
+
+        if(list == null || alreadyHasCategory(category)) throw  new Exception("Kategoria już istnieje, lub nie ma kolekcji do której mozna ja dodac");
+        list.add(category);
         flatCategoriesMap.put(category.getId(), category);
+    }
+
+    private boolean alreadyHasCategory(CashFlowCategory category) {
+        return flatCategoriesMap.containsKey(category.getId());
     }
 
     @Override

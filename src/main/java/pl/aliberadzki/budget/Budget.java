@@ -20,7 +20,7 @@ public interface Budget {
 
     double plannedMonthlyIncomes(DateRange dateRange);
 
-    void addCategory(CashFlowCategory ec);
+    void addCategory(CashFlowCategory ec) throws Exception;
 
     CashFlowCategory getCategory(int categoryId);
 }

@@ -177,94 +177,230 @@ public class BaseBudgetTest {
 
     @Test
     public void testAddingExpenseCategoryWithSubcategories() throws Exception {
-        BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave2 = new ExpenseCategory(3, "Jedzenie na miescie", 1000.0, new DateRangeImpl("201607"));
-        b.addCategory(master);
-        b.addCategory(master.getId(), slave1);
-        b.addCategory(master.getId(), slave2);
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+
+        int expenseCategoryId = 11;
+        String expenseCategoryName = "Jedzenie";
+        Double plannedExpenses = null;
+        DateRange expenseCategoryStartingFromDate = new DateRangeImpl("201607");
+
+        t = new AddExpenseCategoryTransaction(budgetId, expenseCategoryId, expenseCategoryName, plannedExpenses, expenseCategoryStartingFromDate);
+        t.execute();
+
+        int firstsubcategoryId = 22;
+        int secondsubcategoryId = 33;
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, firstsubcategoryId, expenseCategoryId, "Jedzenie na mieście", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, secondsubcategoryId, expenseCategoryId, "Jedzenie w domu", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
 
         assertEquals(2000.0, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.001);
     }
 
     @Test
     public void testAddingExpenseCategoryWithSubcategoriesWithSubcategories() throws Exception {
-        BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave11 = new ExpenseCategory(3, "Biedronka", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave12 = new ExpenseCategory(4, "Delikatesy", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave2 = new ExpenseCategory(5, "Jedzenie na miescie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave21 = new ExpenseCategory(6, "Knajpy", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave22 = new ExpenseCategory(7, "Pizza na dowoz", 1000.0, new DateRangeImpl("201607"));
-        b.addCategory(master);
-        b.addCategory(master.getId(), slave1);
-        b.addCategory(slave1.getId(), slave11);
-        b.addCategory(slave1.getId(), slave12);
-        b.addCategory(master.getId(), slave2);
-        b.addCategory(slave2.getId(), slave21);
-        b.addCategory(slave2.getId(), slave22);
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+        int expenseCategoryId = 1;
+        DateRange expenseCategoryStartingFromDate = new DateRangeImpl("201607");
+
+        t = new AddExpenseCategoryTransaction(budgetId, expenseCategoryId, "Jedzenie", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 12, expenseCategoryId, "Jedzenie w domu", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 121, 12, "biedronka", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 122, 12, "delikatesy", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 11, expenseCategoryId, "Jedzenie na mieście", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 111, 11, "knajpy", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 112, 11, "pizza na dowóz", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+
+//        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave11 = new ExpenseCategory(3, "Biedronka", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave12 = new ExpenseCategory(4, "Delikatesy", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave2 = new ExpenseCategory(5, "Jedzenie na miescie", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave21 = new ExpenseCategory(6, "Knajpy", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave22 = new ExpenseCategory(7, "Pizza na dowoz", 1000.0, new DateRangeImpl("201607"));
+//        b.addCategory(master);
+//        b.addCategory(master.getId(), slave1);
+//        b.addCategory(slave1.getId(), slave11);
+//        b.addCategory(slave1.getId(), slave12);
+//        b.addCategory(master.getId(), slave2);
+//        b.addCategory(slave2.getId(), slave21);
+//        b.addCategory(slave2.getId(), slave22);
 
         assertEquals(4000.0, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.001);
     }
 
     @Test(expected = Exception.class)
     public void testAddingSubcategoriesWithConflictingNames() throws Exception {
-        BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave11 = new ExpenseCategory(3, "Biedronka", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave12 = new ExpenseCategory(4, "Delikatesy", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave2 = new ExpenseCategory(5, "Jedzenie na miescie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave21 = new ExpenseCategory(6, "Knajpy", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave22 = new ExpenseCategory(4, "Pizza na dowoz", 1000.0, new DateRangeImpl("201607")); //conflicting id!
-        b.addCategory(master);
-        b.addCategory(master.getId(), slave1);
-        b.addCategory(slave1.getId(), slave11);
-        b.addCategory(slave1.getId(), slave12);
-        b.addCategory(master.getId(), slave2);
-        b.addCategory(slave2.getId(), slave21);
-        b.addCategory(slave2.getId(), slave22);//exception expected
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+        int expenseCategoryId = 1;
+        DateRange expenseCategoryStartingFromDate = new DateRangeImpl("201607");
+
+        t = new AddExpenseCategoryTransaction(budgetId, expenseCategoryId, "Jedzenie", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 12, expenseCategoryId, "Jedzenie w domu", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 121, 12, "biedronka", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 122, 12, "delikatesy", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 11, expenseCategoryId, "Jedzenie na mieście", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 111, 11, "knajpy", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 122, 11, "pizza na dowóz", 1000.00, expenseCategoryStartingFromDate);//conflicting id
+        t.execute();//exception expected
+
+//        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave11 = new ExpenseCategory(3, "Biedronka", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave12 = new ExpenseCategory(4, "Delikatesy", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave2 = new ExpenseCategory(5, "Jedzenie na miescie", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave21 = new ExpenseCategory(6, "Knajpy", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave22 = new ExpenseCategory(4, "Pizza na dowoz", 1000.0, new DateRangeImpl("201607")); //conflicting id!
+//        b.addCategory(master);
+//        b.addCategory(master.getId(), slave1);
+//        b.addCategory(slave1.getId(), slave11);
+//        b.addCategory(slave1.getId(), slave12);
+//        b.addCategory(master.getId(), slave2);
+//        b.addCategory(slave2.getId(), slave21);
+//        b.addCategory(slave2.getId(), slave22);//exception expected
     }
 
     @Test(expected = Exception.class)
     public void testAddingExpenseCategoryWithExistingSubcategoryOnThisLevel() throws Exception {
-        BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave2 = new ExpenseCategory(3, "Jedzenie w domu", 1200.0, new DateRangeImpl("201607"));
-        b.addCategory(master);
-        b.addCategory(master.getId(), slave1);
-        b.addCategory(master.getId(), slave2); // the same name on the same level, exception
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+        int expenseCategoryId = 1;
+        DateRange expenseCategoryStartingFromDate = new DateRangeImpl("201607");
+
+        t = new AddExpenseCategoryTransaction(budgetId, expenseCategoryId, "Jedzenie", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 11, expenseCategoryId, "Jedzenie w domu", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 12, expenseCategoryId, "Jedzenie w domu", null, expenseCategoryStartingFromDate);
+        t.execute();// the same name on the same level, exception
+
+//        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave2 = new ExpenseCategory(3, "Jedzenie w domu", 1200.0, new DateRangeImpl("201607"));
+//        b.addCategory(master);
+//        b.addCategory(master.getId(), slave1);
+//        b.addCategory(master.getId(), slave2); // the same name on the same level, exception
     }
 
     @Test
     public void testAddingExpenseCategoryWithExistingSubcategoryOnAnotherLevel() throws Exception {
-        BaseBudget b = new BaseBudget();
-        CashFlowCategory master1 = new ExpenseCategory(1, "Ja", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave11 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave12 = new ExpenseCategory(3, "Jedzenie na miescie", 1200.0, new DateRangeImpl("201607"));
-        CashFlowCategory master2 = new ExpenseCategory(4, "Rodzice", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave21 = new ExpenseCategory(5, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
-        CashFlowCategory slave22 = new ExpenseCategory(6, "Jedzenie na miescie", 1200.0, new DateRangeImpl("201607"));
-        b.addCategory(master1);
-        b.addCategory(master2);
-        b.addCategory(master1.getId(), slave11);
-        b.addCategory(master1.getId(), slave12);
-        b.addCategory(master2.getId(), slave21);
-        b.addCategory(master2.getId(), slave22);
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+
+        DateRange expenseCategoryStartingFromDate = new DateRangeImpl("201607");
+
+        t = new AddExpenseCategoryTransaction(budgetId, 1, "Ja", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 11, 1, "Jedzenie na mieście", 1200.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 12, 1, "Jedzenie w domu", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseCategoryTransaction(budgetId, 2, "Rodzice", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 21, 2, "Jedzenie na mieście", 1200.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 22, 2, "Jedzenie w domu", 1000.00, expenseCategoryStartingFromDate);
+        t.execute();
+
+
+//        CashFlowCategory master1 = new ExpenseCategory(1, "Ja", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave11 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave12 = new ExpenseCategory(3, "Jedzenie na miescie", 1200.0, new DateRangeImpl("201607"));
+//        CashFlowCategory master2 = new ExpenseCategory(4, "Rodzice", null, new DateRangeImpl("201607"));
+//        CashFlowCategory slave21 = new ExpenseCategory(5, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+//        CashFlowCategory slave22 = new ExpenseCategory(6, "Jedzenie na miescie", 1200.0, new DateRangeImpl("201607"));
+//        b.addCategory(master1);
+//        b.addCategory(master2);
+//        b.addCategory(master1.getId(), slave11);
+//        b.addCategory(master1.getId(), slave12);
+//        b.addCategory(master2.getId(), slave21);
+//        b.addCategory(master2.getId(), slave22);
 
         assertEquals(4400.0, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.001);
     }
 
     @Test(expected = Exception.class)
     public void testAddingSubcategoryToNonExistentExpenseCategory() throws Exception {
-        BaseBudget b = new BaseBudget();
-        CashFlowCategory master = new ExpenseCategory(1, "Jedzenie", null, new DateRangeImpl("201607"));
-        CashFlowCategory slave1 = new ExpenseCategory(2, "Jedzenie w domu", 1000.0, new DateRangeImpl("201607"));
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
 
-        b.addCategory(master.getId(), slave1); // exception expected
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+
+        DateRange expenseCategoryStartingFromDate = new DateRangeImpl("201607");
+
+        t = new AddExpenseCategoryTransaction(budgetId, 1, "Ja", null, expenseCategoryStartingFromDate);
+        t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 11, 1111, "Jedzenie na mieście", 1200.00, expenseCategoryStartingFromDate);
+        t.execute();// exception expected
+
+        //b.addCategory(master.getId(), slave1); // exception expected
     }
 
     @Test

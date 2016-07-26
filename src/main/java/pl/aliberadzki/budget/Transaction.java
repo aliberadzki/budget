@@ -5,5 +5,5 @@ package pl.aliberadzki.budget;
  */
 public interface Transaction {
 
-    void execute();
+    void execute() throws Exception;
 }

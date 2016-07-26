@@ -17,6 +17,7 @@ public class ExpenseCategory implements CashFlowCategory {
 
     private String name;
     private int id;
+    private int masterId;
 
     public ExpenseCategory(int id, String name, Double expectedAmount) throws Exception {
         this(id, name, expectedAmount, null);
@@ -36,6 +37,12 @@ public class ExpenseCategory implements CashFlowCategory {
         this.id = id;
         effectiveSince = date;
         basicAmount = expectedAmount == null ? 0.0 : expectedAmount;
+    }
+
+    public ExpenseCategory(int id, int masterCategoryId, String name, Double plannedAmount, DateRange date) throws Exception {
+        this(id, name, plannedAmount, date);
+        this.masterId = masterCategoryId;
+
     }
 
 

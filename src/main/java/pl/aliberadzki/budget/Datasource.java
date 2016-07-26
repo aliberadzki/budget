@@ -11,5 +11,5 @@ public interface Datasource {
 
     CashFlowCategory getCategory(int budgetId, int categoryId);
 
-    void addCategory(int budgetId, CashFlowCategory category);
+    void addCategory(int budgetId, CashFlowCategory category) throws Exception;
 }
