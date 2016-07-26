@@ -5,7 +5,6 @@ package pl.aliberadzki.budget;
  */
 public class AddExpenseSubcategoryTransaction extends AddCategoryTransaction implements Transaction {
     private int categoryId;
-    private int masterCategoryId;
     private String categoryName;
     private Double plannedAmount;
     private DateRange startingFrom;

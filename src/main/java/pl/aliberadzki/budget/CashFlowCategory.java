@@ -20,5 +20,12 @@ public interface CashFlowCategory {
 
     void addSubCategory(CashFlowCategory subcategory) throws Exception;
 
+    CashFlowCategory getSubCategory(int id);
+
+    CashFlowCategory getSubCategory(String name);
+
+    Integer getMasterCategoryId();
+
     int getId();
+
 }

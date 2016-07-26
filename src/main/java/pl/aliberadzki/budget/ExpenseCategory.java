@@ -16,8 +16,8 @@ public class ExpenseCategory implements CashFlowCategory {
     private Double basicAmount = 0.0;
 
     private String name;
-    private int id;
-    private int masterId;
+    private Integer id;
+    private Integer masterId;
 
     public ExpenseCategory(int id, String name, Double expectedAmount) throws Exception {
         this(id, name, expectedAmount, null);
@@ -105,7 +105,7 @@ public class ExpenseCategory implements CashFlowCategory {
     public double getBalanceAt(DateRange date) {
         return this.expenses.stream()
                 .filter(o -> o.getDate().isIncludedIn(date))
-                .mapToDouble(o-> o.getAmount()).sum();
+                .mapToDouble(Operation::getAmount).sum();
     }
 
     @Override
@@ -117,7 +117,22 @@ public class ExpenseCategory implements CashFlowCategory {
     }
 
     @Override
+    public CashFlowCategory getSubCategory(int id) {
+        return subcatgories.stream().filter(c -> c.getId() == id).findFirst().orElse(null);
+    }
+
+    @Override
+    public CashFlowCategory getSubCategory(String name) {
+        return subcatgories.stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Integer getMasterCategoryId() {
+        return masterId;
+    }
+
+    @Override
     public int getId() {
-        return this.id;
+        return id;
     }
 }

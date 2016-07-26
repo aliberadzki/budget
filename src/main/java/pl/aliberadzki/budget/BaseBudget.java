@@ -79,7 +79,12 @@ public class BaseBudget implements Budget{
         }
 
         if(list == null || alreadyHasCategory(category)) throw  new Exception("Kategoria już istnieje, lub nie ma kolekcji do której mozna ja dodac");
-        list.add(category);
+        if(category.getMasterCategoryId() != null) {
+            //TODO: addSubcategory to this masterCategory
+        }
+        else {
+            list.add(category);
+        }
         flatCategoriesMap.put(category.getId(), category);
     }
 
