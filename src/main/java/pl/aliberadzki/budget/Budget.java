@@ -23,4 +23,6 @@ public interface Budget {
     void addCategory(CashFlowCategory ec) throws Exception;
 
     CashFlowCategory getCategory(int categoryId);
+
+    double expensesSpentPercentage(DateRange dateRange);
 }

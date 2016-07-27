@@ -5,11 +5,15 @@ package pl.aliberadzki.budget;
  */
 public interface Datasource {
 
-    Budget getBudget(int budgetId);
+    Budget getBudget(Integer budgetId);
 
     void addBudget(Budget budget);
 
-    CashFlowCategory getCategory(int budgetId, int categoryId);
+    CashFlowCategory getCategory(Integer budgetId, Integer categoryId);
 
-    void addCategory(int budgetId, CashFlowCategory category) throws Exception;
+    void addCategory(Integer budgetId, CashFlowCategory category) throws Exception;
+
+    void addCategory(Integer budgetId, Integer masterCategoryId, CashFlowCategory category) throws Exception;
+
+    void clear();
 }

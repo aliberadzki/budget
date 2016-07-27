@@ -21,4 +21,9 @@ public class SetNewExpectedAmountFromDateTransaction implements Transaction {
         CashFlowCategory cfc = DummyDatabase.instance().getCategory(budgetId, categoryId);
         cfc.setNewExpectedAmountFrom(dateRange, newAmount);
     }
+
+    @Override
+    public void rollback() throws Exception {
+        //TODO implement
+    }
 }

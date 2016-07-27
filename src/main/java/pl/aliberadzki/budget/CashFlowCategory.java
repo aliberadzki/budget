@@ -22,6 +22,7 @@ public interface CashFlowCategory {
 
     CashFlowCategory getSubCategory(int id);
 
+    @Deprecated
     CashFlowCategory getSubCategory(String name);
 
     Integer getMasterCategoryId();

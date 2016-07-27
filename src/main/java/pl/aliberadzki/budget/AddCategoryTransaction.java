@@ -7,7 +7,7 @@ package pl.aliberadzki.budget;
 public abstract class AddCategoryTransaction implements Transaction {
     protected int budgetId;
     protected Integer masterCategoryId = null;
-    private CashFlowCategory ec;
+    private CashFlowCategory ec = null;
 
     protected abstract CashFlowCategory getCashFlowCategory() throws Exception;
 
@@ -15,11 +15,12 @@ public abstract class AddCategoryTransaction implements Transaction {
     @Override
     public void execute() throws Exception {
         ec = getCashFlowCategory();
-        /*if(masterCategoryId != null) {
-            CashFlowCategory master = DummyDatabase.instance().getCategory(budgetId, masterCategoryId);
-            if(master.getSubCategory(ec.getName()) != null) throw new Exception("Category has subcategory with this name!");
-        }*/
-        //TODO: IF this is subcategory addition check for existence of one with the same name
-        DummyDatabase.instance().addCategory(budgetId, ec);
+        DummyDatabase.instance().addCategory(budgetId, masterCategoryId,  ec);
+    }
+
+    @Override
+    public void rollback() throws Exception {
+        //TODO: implement
+        ec = ec == null ? getCashFlowCategory() : ec;
     }
 }

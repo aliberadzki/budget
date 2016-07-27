@@ -6,4 +6,6 @@ package pl.aliberadzki.budget;
 public interface Transaction {
 
     void execute() throws Exception;
+
+    void rollback() throws Exception;
 }

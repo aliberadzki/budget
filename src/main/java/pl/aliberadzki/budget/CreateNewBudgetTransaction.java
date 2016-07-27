@@ -17,4 +17,9 @@ public class CreateNewBudgetTransaction implements Transaction {
         Budget b = new BaseBudget(id, name);
         DummyDatabase.instance().addBudget(b);
     }
+
+    @Override
+    public void rollback() throws Exception {
+        //TODO implement
+    }
 }
