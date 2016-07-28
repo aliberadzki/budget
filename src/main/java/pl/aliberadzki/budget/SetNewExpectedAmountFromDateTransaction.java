@@ -4,12 +4,12 @@ package pl.aliberadzki.budget;
  * Created by aliberadzki on 2016-07-25.
  */
 public class SetNewExpectedAmountFromDateTransaction implements Transaction {
-    private int budgetId;
-    private int categoryId;
+    private Integer budgetId;
+    private Integer categoryId;
     private DateRange dateRange;
-    private double newAmount;
+    private Double newAmount;
 
-    public SetNewExpectedAmountFromDateTransaction(int budgetId, int categoryId, DateRange dateRange, double newAmount) {
+    public SetNewExpectedAmountFromDateTransaction(Integer budgetId, Integer categoryId, DateRange dateRange, Double newAmount) {
         this.budgetId = budgetId;
         this.categoryId = categoryId;
         this.dateRange = dateRange;
@@ -17,7 +17,7 @@ public class SetNewExpectedAmountFromDateTransaction implements Transaction {
     }
 
     @Override
-    public void execute() {
+    public void execute() throws Exception {
         CashFlowCategory cfc = DummyDatabase.instance().getCategory(budgetId, categoryId);
         cfc.setNewExpectedAmountFrom(dateRange, newAmount);
     }

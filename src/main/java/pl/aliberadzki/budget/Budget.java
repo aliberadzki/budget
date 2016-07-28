@@ -8,21 +8,21 @@ public interface Budget {
 
     //void addExpenseCategory(CashFlowCategory ec);
 
-    double plannedMonthlyExpenses(DateRange dateRange);
+    Double plannedMonthlyExpenses(DateRange dateRange);
 
-    double monthlyExpenses(DateRange dateRange);
+    Double monthlyExpenses(DateRange dateRange);
 
-    double monthlyInvestments(DateRange dateRange);
+    Double monthlyInvestments(DateRange dateRange);
 
-    double monthlyIncomes(DateRange dateRange);
+    Double monthlyIncomes(DateRange dateRange);
 
-    double plannedMonthlyInvestments(DateRange dateRange);
+    Double plannedMonthlyInvestments(DateRange dateRange);
 
-    double plannedMonthlyIncomes(DateRange dateRange);
+    Double plannedMonthlyIncomes(DateRange dateRange);
 
     void addCategory(CashFlowCategory ec) throws Exception;
 
-    CashFlowCategory getCategory(int categoryId);
+    CashFlowCategory getCategory(Integer categoryId);
 
-    double expensesSpentPercentage(DateRange dateRange);
+    Double expensesSpentPercentage(DateRange dateRange);
 }

@@ -57,30 +57,30 @@ public class ExpenseCategory implements CashFlowCategory {
     public Double getExpectedBalanceAt(DateRange date) {
         Double fromSubcategories = 0.0;
         if(subcatgories.size() > 0) {
-            fromSubcategories =
-                    subcatgories.stream()
-                            .reduce(0.0, (sum, c) -> sum += c.getExpectedBalanceAt(date), (sum1, sum2) -> sum1 + sum2);
+            fromSubcategories = subcatgories.stream()
+                                .reduce(0.0, (sum, c) -> sum += c.getExpectedBalanceAt(date), (sum1, sum2) -> sum1 + sum2);
         }
-
         if(expectedBalancesOverridesForMonth.containsKey(date))
             return Math.max(expectedBalancesOverridesForMonth.get(date), fromSubcategories);
 
         DateRange key = getOverrideSinceMonthFor(date);
-        if(key != null) return Math.max(expectedBalancesOverridesSinceMonth.get(key), fromSubcategories);
+        if(key != null)
+            return Math.max(expectedBalancesOverridesSinceMonth.get(key), fromSubcategories);
 
-        if(effectiveSince.compareTo(date) < 1) return Math.max(basicAmount, fromSubcategories);
+        if(effectiveSince.compareTo(date) < 1)
+            return Math.max(basicAmount, fromSubcategories);
 
         return Math.max(0.0, fromSubcategories);
     }
 
     @Override
-    public void setNewExpectedAmountFrom(DateRange date, double amount) {
-        this.expectedBalancesOverridesSinceMonth.put(date,amount);
+    public void setNewExpectedAmountFrom(DateRange date, Double amount) throws Exception {
+        this.expectedBalancesOverridesSinceMonth.put(date.stripDays(),amount);
     }
 
     @Override
-    public void setNewExpectedAmountFor(DateRange date, double amount) {
-        this.expectedBalancesOverridesForMonth.put(date,amount);
+    public void setNewExpectedAmountFor(DateRange date, Double amount) throws Exception {
+        this.expectedBalancesOverridesForMonth.put(date.stripDays(),amount);
     }
 
     @Override
@@ -91,6 +91,7 @@ public class ExpenseCategory implements CashFlowCategory {
     @Override
     public void addOperation(Operation operation) throws Exception {
         if(this.getExpectedBalanceAt(operation.getDate()) - this.getBalanceAt(operation.getDate()) - operation.getAmount() < 0) {
+            //TODO : introduce unique exception
             throw new Exception("Przekroczono przewidywane wydatki");
         }
         this.expenses.add(operation);
@@ -102,7 +103,7 @@ public class ExpenseCategory implements CashFlowCategory {
     }
 
     @Override
-    public double getBalanceAt(DateRange date) {
+    public Double getBalanceAt(DateRange date) {
         return this.expenses.stream()
                 .filter(o -> o.getDate().isIncludedIn(date))
                 .mapToDouble(Operation::getAmount).sum();
@@ -111,13 +112,13 @@ public class ExpenseCategory implements CashFlowCategory {
     @Override
     public void addSubCategory(CashFlowCategory subcategory) throws Exception {
         boolean foundCfc = this.subcatgories.stream().anyMatch(cfc -> cfc.getName().equals(subcategory.getName()));
-
+        //TODO exception
         if(foundCfc) throw new Exception("Już istnieje podkategoria o nazwie: " + subcategory.getName());
         subcatgories.add(subcategory);
     }
 
     @Override
-    public CashFlowCategory getSubCategory(int id) {
+    public CashFlowCategory getSubCategory(Integer id) {
         return subcatgories.stream().filter(c -> c.getId() == id).findFirst().orElse(null);
     }
 
@@ -132,7 +133,7 @@ public class ExpenseCategory implements CashFlowCategory {
     }
 
     @Override
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 }

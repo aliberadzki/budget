@@ -54,7 +54,7 @@ public class ExpenseCategoryTest {
 
     @Test
     public void testGetId() throws Exception {
-        int id = 123;
+        Integer id = 123;
         CashFlowCategory cfc = new ExpenseCategory(id, "nazwa", 21.0);
         assertEquals(id, cfc.getId());
     }

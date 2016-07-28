@@ -7,25 +7,26 @@ import java.time.LocalDate;
  */
 public final class DateRangeImpl implements DateRange {
 
-    private final int granularity;
+    private final Integer granularity;
 
-    private final int currentYear;
-    private final int currentMonth;
-    private final int currentDay;
+    private final Integer currentYear;
+    private final Integer currentMonth;
+    private final Integer currentDay;
 
     public DateRangeImpl(String startingFrom) {
         String year = startingFrom.substring(0,4);
         String month = "00";
         String day = "00";
-        int granularity = this.YEARLY;
+        Integer granularity = YEARLY;
 
         if(startingFrom.length() >= 6) {
             month = startingFrom.substring(4,6);
-            granularity = this.MONTHLY;
+            granularity = MONTHLY;
         }
+
         if(startingFrom.length() >= 8) {
             day = startingFrom.substring(6,8);
-            granularity = this.DAILY;
+            granularity = DAILY;
         }
 
         this.currentDay = Integer.valueOf(day);
@@ -35,29 +36,36 @@ public final class DateRangeImpl implements DateRange {
 
     }
 
-    public DateRangeImpl(int year) {
+    public DateRangeImpl(Integer year) {
         this.currentDay = 0;
         this.currentMonth = 0;
         this.currentYear = year;
         granularity = YEARLY;
     }
 
-    public DateRangeImpl(int year, int month) throws Exception {
-        if(month > 12 || month < 1) throw new Exception("nie ma takiego miesiaca: " + month);
+    public DateRangeImpl(Integer year, Integer month) throws Exception {
+        //TODO exception
+        if(month > 12 || month < 1)
+            throw new Exception("nie ma takiego miesiaca: " + month);
+
         this.currentYear = year;
         this.currentMonth = month;
         this.currentDay = 0;
         granularity = MONTHLY;
     }
 
-    public DateRangeImpl(int year, int month, int day) throws Exception {
+    public DateRangeImpl(Integer year, Integer month, Integer day) throws Exception {
         this(year, month, day, DAILY);
     }
 
 
-    public DateRangeImpl(int year, int month, int day, int granularity) throws Exception {
-        if(month > 12 || month < 1) throw new Exception("nie ma takiego miesiaca: " + month);
-        if(day < 0 || day > daysInMonth(month,year)) throw new Exception("miesiac " + month + " nie ma takiego dnia: " + day);
+    public DateRangeImpl(Integer year, Integer month, Integer day, Integer granularity) throws Exception {
+        //TODO Exception
+        if(month > 12 || month < 1)
+            throw new Exception("nie ma takiego miesiaca: " + month);
+        if(day < 0 || day > daysInMonth(month,year))
+            throw new Exception("miesiac " + month + " nie ma takiego dnia: " + day);
+
         this.currentDay = day;
         this.currentYear = year;
         this.currentMonth = month;
@@ -70,31 +78,31 @@ public final class DateRangeImpl implements DateRange {
 
     @Override
     public DateRange increment(Integer cycle) throws Exception {
-        if(cycle < this.granularity) return this;
-        if(cycle == YEARLY) {
+        if(cycle < this.granularity)
+            return this;
+
+        if(cycle == YEARLY)
             return incrementYear();
-        }
-        if(cycle == MONTHLY) {
+
+        if(cycle == MONTHLY)
             return incrementMonth();
-        }
 
-        if(cycle == WEEKLY) {
+        if(cycle == WEEKLY)
             return incrementWeek();
-        }
 
-        if(cycle == DAILY) {
+        if(cycle == DAILY)
             return incrementDay();
-        }
+        //TODO exception
         throw new Exception("nie ma takiego cyku: " + cycle);
     }
 
     private DateRange incrementYear() throws Exception {
-        int newYear = currentYear,
+        Integer newYear = currentYear,
                 newMonth = currentMonth,
                 newDay = currentDay;
 
         newYear++;
-        int daysInThisMonth = daysInMonth(newMonth, newYear);
+        Integer daysInThisMonth = daysInMonth(newMonth, newYear);
         if(newDay > daysInThisMonth) {
             newDay = daysInThisMonth;
         }
@@ -102,7 +110,7 @@ public final class DateRangeImpl implements DateRange {
     }
 
     private DateRange incrementMonth() throws Exception {
-        int newYear = currentYear,
+        Integer newYear = currentYear,
                 newMonth = currentMonth,
                 newDay = currentDay;
 
@@ -111,7 +119,7 @@ public final class DateRangeImpl implements DateRange {
             newMonth = 0;
         }
         newMonth++;
-        int daysInThisMonth = daysInMonth(newMonth, newYear);
+        Integer daysInThisMonth = daysInMonth(newMonth, newYear);
         if(newDay > daysInThisMonth) {
             newDay = daysInThisMonth;
         }
@@ -119,11 +127,11 @@ public final class DateRangeImpl implements DateRange {
     }
 
     private DateRange incrementWeek() throws Exception {
-        int newYear = currentYear,
+        Integer newYear = currentYear,
                 newMonth = currentMonth,
                 newDay = currentDay;
 
-        int daysInThisMonth = daysInMonth(newMonth, newYear);
+        Integer daysInThisMonth = daysInMonth(newMonth, newYear);
         newDay += 7;
         if(newDay> daysInThisMonth) {
             if(newMonth == 12) {
@@ -137,9 +145,10 @@ public final class DateRangeImpl implements DateRange {
     }
 
     private DateRange incrementDay() throws Exception {
-        int newYear = currentYear,
-                newMonth = currentMonth,
-                newDay = currentDay;
+        Integer newYear = currentYear,
+            newMonth = currentMonth,
+            newDay = currentDay;
+
         if(newDay+1 > daysInMonth(newMonth, newYear)) {
             newDay = 0;
             if(newMonth == 12) {
@@ -173,27 +182,25 @@ public final class DateRangeImpl implements DateRange {
     }
 
     @Override
-    public boolean isIncludedIn(DateRange another) {
+    public Boolean isIncludedIn(DateRange another) {
         return another.includes(this);
     }
 
     @Override
-    public boolean includes(DateRange another) {
-        if (granularity == YEARLY) {
+    public Boolean includes(DateRange another) {
+        if (granularity.equals(YEARLY))
             return currentYear == another.getYear();
-        }
 
-        if (granularity == MONTHLY) {
-            return currentYear == another.getYear() && currentMonth == another.getMonth();
-        }
+        if (granularity.equals(MONTHLY))
+            return currentYear.equals(another.getYear()) && currentMonth.equals(another.getMonth());
 
         return this.equalsDate(another);
     }
 
     @Override
-    public int compareTo(DateRange another) {
-        int thisBigger = 1;
-        int thisLower= -1;
+    public Integer compareTo(DateRange another) {
+        Integer thisBigger = 1;
+        Integer thisLower= -1;
         if(this.equalsDate(another) || this.includes(another) || another.includes(this)) return 0;
         if(currentYear > another.getYear()) return thisBigger; //lub -1?
         if(currentYear < another.getYear()) return thisLower;
@@ -216,14 +223,19 @@ public final class DateRangeImpl implements DateRange {
     }
 
     @Override
-    public boolean equalsDate(DateRange another) {
-        return currentYear == another.getYear()
-                && currentMonth == another.getMonth()
-                && currentDay == another.getDay();
+    public DateRange stripDays() throws Exception {
+        return new DateRangeImpl(currentYear,currentMonth);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public Boolean equalsDate(DateRange another) {
+        return currentYear.equals(another.getYear())
+                && currentMonth.equals(another.getMonth())
+                && currentDay.equals(another.getDay());
+    }
+
+    @Override
+    public boolean  equals(Object o) {
         return o instanceof DateRange && (o == this || ((DateRange) o).equalsDate(this));
     }
 
@@ -232,7 +244,7 @@ public final class DateRangeImpl implements DateRange {
         return granularity * 100000000 + currentYear * 10000 + currentMonth * 100 + currentDay;
     }
 
-    private int daysInMonth(int month, int year) {
+    private Integer daysInMonth(Integer month, Integer year) {
         switch(month) {
             case 4:
             case 6:
@@ -246,7 +258,7 @@ public final class DateRangeImpl implements DateRange {
         }
     }
 
-    private boolean isLeapYear(int year) {
+    private Boolean isLeapYear(Integer year) {
         return year % 4 == 0;
     }
 

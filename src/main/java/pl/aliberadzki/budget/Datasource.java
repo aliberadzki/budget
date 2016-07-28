@@ -16,4 +16,12 @@ public interface Datasource {
     void addCategory(Integer budgetId, Integer masterCategoryId, CashFlowCategory category) throws Exception;
 
     void clear();
+
+    static Datasource getInstance() {
+        return DummyDatabase.instance();
+    }
+
+    void addOperation(Integer budgetId, Integer categoryId, Operation operation) throws Exception;
+
+    void forceAddOperation(Integer budgetId, Integer categoryId, Operation operation) throws Exception;
 }

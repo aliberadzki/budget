@@ -16,6 +16,7 @@ public class DummyDatabase implements Datasource {
     private Map<Integer, Integer> categoriesToBudgets;
     private Map<Integer, Integer> categoriesToParents;
     private Map<Integer, Budget> allBudgets;
+    private Map<Integer, Operation> allOperations;
 
     public static Datasource instance() {
         if(db == null) {
@@ -27,6 +28,7 @@ public class DummyDatabase implements Datasource {
     private DummyDatabase() {
         this.allCategories = new HashMap<>();
         this.allBudgets = new HashMap<>();
+        this.allOperations = new HashMap<>();
         this.categoriesToBudgets = new HashMap<>();
         this.categoriesToParents = new HashMap<>();
     }
@@ -80,8 +82,25 @@ public class DummyDatabase implements Datasource {
     public void clear() {
         this.allCategories = new HashMap<>();
         this.allBudgets = new HashMap<>();
+        this.allOperations = new HashMap<>();
         this.categoriesToBudgets = new HashMap<>();
         this.categoriesToParents = new HashMap<>();
+    }
+
+    @Override
+    public void addOperation(Integer budgetId, Integer categoryId, Operation operation) throws Exception {
+        //TODO: throw custom exception
+        if(allOperations.containsKey(operation.getId())) throw new Exception("There already is operation with id: " + operation.getId());
+        this.allBudgets.get(budgetId).getCategory(categoryId).addOperation(operation);
+        this.allOperations.put(operation.getId(), operation);
+    }
+
+    @Override
+    public void forceAddOperation(Integer budgetId, Integer categoryId, Operation operation) throws Exception {
+        //TODO: throw custom exception
+        if(allOperations.containsKey(operation.getId())) throw new Exception("There already is operation with id: " + operation.getId());
+        this.allBudgets.get(budgetId).getCategory(categoryId).forceAddOperation(operation);
+        this.allOperations.put(operation.getId(), operation);
     }
 
     private boolean alreadyHasSubcategoryOnThisLevel(Integer budgetId, Integer masterCategoryId, CashFlowCategory category) {

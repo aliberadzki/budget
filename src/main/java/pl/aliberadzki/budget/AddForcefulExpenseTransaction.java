@@ -1,19 +1,19 @@
 package pl.aliberadzki.budget;
 
 /**
- * Created by aliberadzki on 2016-07-27.
+ * Created by aliberadzki on 2016-07-28.
  */
-public class AddExpenseTransaction implements Transaction {
-    private Integer budgetId;
+public class AddForcefulExpenseTransaction implements Transaction {
     private Integer id;
+    private Integer budgetId;
     private Integer categoryId;
     private Double amount;
     private DateRange date;
     private String description;
 
-    public AddExpenseTransaction(Integer id, Integer budgetId, Integer categoryId, Double amount, DateRange date, String description) {
-        this.budgetId = budgetId;
+    public AddForcefulExpenseTransaction(Integer id, Integer budgetId, Integer categoryId, Double amount, DateRange date, String description) {
         this.id = id;
+        this.budgetId = budgetId;
         this.categoryId = categoryId;
         this.amount = amount;
         this.date = date;
@@ -22,12 +22,12 @@ public class AddExpenseTransaction implements Transaction {
 
     @Override
     public void execute() throws Exception {
-        Operation o = new Expense(id, amount,date,description);
-        DummyDatabase.instance().addOperation(budgetId,categoryId, o);
+        Operation o = new Expense(id,amount,date,description);
+        Datasource.getInstance().forceAddOperation(budgetId, categoryId, o);
     }
 
     @Override
     public void rollback() throws Exception {
-        //TODO: implement
+
     }
 }

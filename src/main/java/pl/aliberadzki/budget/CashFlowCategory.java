@@ -6,9 +6,9 @@ package pl.aliberadzki.budget;
 public interface CashFlowCategory {
     Double getExpectedBalanceAt(DateRange date);
 
-    void setNewExpectedAmountFrom(DateRange date, double amount);
+    void setNewExpectedAmountFrom(DateRange date, Double amount) throws Exception;
 
-    void setNewExpectedAmountFor(DateRange date, double amount);
+    void setNewExpectedAmountFor(DateRange date, Double amount) throws Exception;
 
     String getName();
 
@@ -16,17 +16,17 @@ public interface CashFlowCategory {
 
     void forceAddOperation(Operation operation);
 
-    double getBalanceAt(DateRange date);
+    Double getBalanceAt(DateRange date);
 
     void addSubCategory(CashFlowCategory subcategory) throws Exception;
 
-    CashFlowCategory getSubCategory(int id);
+    CashFlowCategory getSubCategory(Integer id);
 
     @Deprecated
     CashFlowCategory getSubCategory(String name);
 
     Integer getMasterCategoryId();
 
-    int getId();
+    Integer getId();
 
 }

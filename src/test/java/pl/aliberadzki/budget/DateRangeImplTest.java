@@ -28,8 +28,11 @@ public class DateRangeImplTest {
     public void testEqualsAndHashCode() throws Exception {
         DateRange dr = new DateRangeImpl("201607");
         DateRange dr2 = new DateRangeImpl("201707");
-        assertEquals(dr2, dr.increment(DateRange.YEARLY));
-        assertEquals(dr2.hashCode(), dr.increment(DateRange.YEARLY).hashCode());
+
+        dr = dr.increment(DateRange.YEARLY);
+
+        assertEquals(dr2, dr);
+        assertEquals(dr2.hashCode(), dr.hashCode());
     }
 
     @Test

@@ -5,7 +5,7 @@ package pl.aliberadzki.budget;
  * Created by aliberadzki on 26.07.16.
  */
 public abstract class AddCategoryTransaction implements Transaction {
-    protected int budgetId;
+    protected Integer budgetId;
     protected Integer masterCategoryId = null;
     private CashFlowCategory ec = null;
 

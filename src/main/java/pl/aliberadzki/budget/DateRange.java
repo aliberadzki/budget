@@ -15,12 +15,13 @@ public interface DateRange {
     Integer getDay();
     Integer getGranularity();
 
-    boolean equalsDate(DateRange another);
-    boolean isIncludedIn(DateRange another);
-    boolean includes(DateRange another);
-    int compareTo(DateRange another);
+    Boolean equalsDate(DateRange another);
+    Boolean isIncludedIn(DateRange another);
+    Boolean includes(DateRange another);
+    Integer compareTo(DateRange another);
 
     @Override
     String toString();
 
+    DateRange stripDays() throws Exception;
 }

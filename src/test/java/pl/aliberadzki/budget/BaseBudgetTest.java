@@ -366,7 +366,7 @@ public class BaseBudgetTest {
         t = new AddExpenseCategoryTransaction(budgetId, 1, "Jedzenie", 200.00, new DateRangeImpl("201607"));
         t.execute();
 
-        t = new AddExpenseTransaction(budgetId, 1, 100.0, new DateRangeImpl("20160714"), "Parówki");
+        t = new AddExpenseTransaction(1, budgetId, 1, 100.0, new DateRangeImpl("20160714"), "Parówki");
         t.execute();
 
         assertEquals(0.5, b.expensesSpentPercentage(new DateRangeImpl("201607")), 0.001);
@@ -384,7 +384,7 @@ public class BaseBudgetTest {
         t = new AddExpenseCategoryTransaction(budgetId, 1, "Jedzenie", 200.00, new DateRangeImpl("201607"));
         t.execute();
 
-        t = new AddExpenseTransaction(budgetId, 1, 300.0, new DateRangeImpl("20160714"), "Parówki");
+        t = new AddExpenseTransaction(1, budgetId, 1, 300.0, new DateRangeImpl("20160714"), "Parówki");
         t.execute();
 
         assertEquals(1.5, b.expensesSpentPercentage(new DateRangeImpl("201607")), 0.001);
@@ -392,11 +392,18 @@ public class BaseBudgetTest {
 
     @Test
     public void testForceAddingExpenseExceedingPlannedAmount() throws Exception {
-        //TODO: move to transactions
-        BaseBudget b = new BaseBudget();
-        CashFlowCategory cfc = new ExpenseCategory(1, "Jedzenie", 200.00, new DateRangeImpl("201607"));
-        b.addCategory(cfc);
-        b.forceAddExpense(1, 300.0, new DateRangeImpl("20160714"), "Parówki");
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+        t = new AddExpenseCategoryTransaction(budgetId, 1, "Jedzenie", 200.00, new DateRangeImpl("201607"));
+        t.execute();
+
+        t = new AddForcefulExpenseTransaction(1, budgetId, 1, 300.0, new DateRangeImpl("20160714"), "Parówki");
+        t.execute();
 
         assertEquals(1.5, b.expensesSpentPercentage(new DateRangeImpl("201607")), 0.001);
     }
@@ -413,7 +420,7 @@ public class BaseBudgetTest {
         t = new AddExpenseCategoryTransaction(budgetId, 1, "Jedzenie", 200.00, new DateRangeImpl("201607"));
         t.execute();
 
-        t = new AddExpenseTransaction(budgetId, 2, 100.0, new DateRangeImpl("20160714"), "Parówki");
+        t = new AddExpenseTransaction(1, budgetId, 2, 100.0, new DateRangeImpl("20160714"), "Parówki");
         t.execute();
 
         assertEquals(0.5, b.expensesSpentPercentage(new DateRangeImpl("201607")), 0.001);
@@ -421,14 +428,25 @@ public class BaseBudgetTest {
 
     @Test
     public void testAddingOnceAYearExpense() throws Exception {
-        //TODO: move to transactions
-        BaseBudget b = new BaseBudget();
-        CashFlowCategory cfc = new ExpenseCategory(1, "Samochód", 500.00);
-        b.addCategory(cfc);
-        b.addCyclicExpense(1, 1600.00, DateRange.YEARLY, new DateRangeImpl("201607"), "Ubezpieczenie AC/OC");
+        int budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
 
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+        t = new AddExpenseCategoryTransaction(budgetId, 1, "Samochód", 200.00, new DateRangeImpl("201607"));
+        t.execute();
+
+        t = new SetNewExpectedAmountCyclicForTransaction(budgetId, 1, 1600.00, DateRange.YEARLY, new DateRangeImpl("20160726"), "Ubezpieczenie AC/OC");
+        t.execute();
+
+        assertEquals(   0.00, b.plannedMonthlyExpenses(new DateRangeImpl("201507")), 0.01);
         assertEquals(1600.00, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.01);
+        assertEquals( 200.00, b.plannedMonthlyExpenses(new DateRangeImpl("201608")), 0.01);
         assertEquals(1600.00, b.plannedMonthlyExpenses(new DateRangeImpl("201707")), 0.01);
+        assertEquals(1600.00, b.plannedMonthlyExpenses(new DateRangeImpl("201807")), 0.01);
+        assertEquals( 200.00, b.plannedMonthlyExpenses(new DateRangeImpl("201901")), 0.01);
 
     }
 }

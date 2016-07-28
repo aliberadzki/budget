@@ -4,18 +4,20 @@ package pl.aliberadzki.budget;
  * Created by aliberadzki on 2016-07-14.
  */
 public class Expense implements Operation {
-    private double amount;
+    private Double amount;
     private DateRange date;
     private String description;
+    private Integer id;
 
 
-    public Expense(double amount, DateRange date, String description) {
+    public Expense(Integer id, Double amount, DateRange date, String description) {
+        this.id = id;
         this.amount = amount;
         this.date = date;
         this.description = description;
     }
 
-    public double getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
@@ -25,5 +27,10 @@ public class Expense implements Operation {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public Integer getId() {
+        return id;
     }
 }
