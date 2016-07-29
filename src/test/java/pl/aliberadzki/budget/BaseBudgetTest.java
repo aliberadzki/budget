@@ -443,10 +443,58 @@ public class BaseBudgetTest {
 
         assertEquals(   0.00, b.plannedMonthlyExpenses(new DateRangeImpl("201507")), 0.01);
         assertEquals(1600.00, b.plannedMonthlyExpenses(new DateRangeImpl("201607")), 0.01);
-        assertEquals( 200.00, b.plannedMonthlyExpenses(new DateRangeImpl("201608")), 0.01);
+        assertEquals(200.00, b.plannedMonthlyExpenses(new DateRangeImpl("201608")), 0.01);
         assertEquals(1600.00, b.plannedMonthlyExpenses(new DateRangeImpl("201707")), 0.01);
         assertEquals(1600.00, b.plannedMonthlyExpenses(new DateRangeImpl("201807")), 0.01);
         assertEquals( 200.00, b.plannedMonthlyExpenses(new DateRangeImpl("201901")), 0.01);
+    }
 
+    @Test
+    public void testStableBudgetRenameMe() throws Exception {
+
+        Integer budgetId = 1;
+        String budgetName = "Budżet Adama";
+        Transaction t = new CreateNewBudgetTransaction(budgetId, budgetName);
+        t.execute();
+
+        Budget b = DummyDatabase.instance().getBudget(budgetId);
+
+        t = new AddIncomeCategoryTransaction(budgetId, 100, "moja pensja", 10000.0, new DateRangeImpl("201607")); t.execute();
+        t = new AddIncomeCategoryTransaction(budgetId, 200, "Asi pensja", 3500.0, new DateRangeImpl("201607")); t.execute();
+        t = new AddIncomeCategoryTransaction(budgetId, 300, "dodatkowe", 500.0, new DateRangeImpl("201607")); t.execute();
+
+        t = new AddExpenseCategoryTransaction(budgetId, 1, "Jedzenie", null); t.execute();
+        t = new AddExpenseCategoryTransaction(budgetId, 2, "Mieszkanie", null); t.execute();
+        t = new AddExpenseCategoryTransaction(budgetId, 3, "Samochód", null); t.execute();
+        t = new AddExpenseCategoryTransaction(budgetId, 4, "Inne", null); t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 11, 1, "Jedzenie w domu (spożywka)", 500.0); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 12, 1, "Jedzenie na mieście", 300.0); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 13, 1, "Catering", 2000.0); t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 21, 2, "Czynsz", 550.0); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 22, 2, "Media", 100.0); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 23, 2, "Zakupy do domu", 100.0); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 24, 2, "Naprawy", 100.0); t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 31, 3, "Paliwo", 400.0); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 32, 3, "Naprawy", 100.0); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 33, 3, "Przeglądy, czesci", 100.0); t.execute();
+
+        t = new AddExpenseSubcategoryTransaction(budgetId, 41, 4, "Ubrania", 200.00); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 42, 4, "Sport", 100.00); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 43, 4, "Imprezki", 200.00); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 44, 4, "Mandaty", 50.00); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 45, 4, "Elektronika", 100.00); t.execute();
+        t = new AddExpenseSubcategoryTransaction(budgetId, 46, 4, "Higiena", 100.00); t.execute();
+
+
+        t = new AddIvestmentCategoryTransaction(budgetId, 1000, "oszczednosci", 5000.0); t.execute();
+        t = new AddIvestmentCategoryTransaction(budgetId, 2000, "urlop", 500.0); t.execute();
+
+
+        assertEquals( 5000.00, b.plannedMonthlyExpenses(new DateRangeImpl("201608")), 0.01);
+        assertEquals(13500.00, b.plannedMonthlyIncomes(new DateRangeImpl("201608")), 0.01);
+        assertEquals( 5500.00, b.plannedMonthlyInvestments(new DateRangeImpl("201608")), 0.01);
     }
 }

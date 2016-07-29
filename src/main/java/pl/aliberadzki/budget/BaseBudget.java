@@ -21,7 +21,6 @@ public class BaseBudget implements Budget{
         this.investmentCategories = new ArrayList<>();
         this.incomeCategories = new ArrayList<>();
         this.flatCategoriesMap = new HashMap<>();
-
     }
 
     public BaseBudget(Integer budgetId, String budgetName) {
@@ -77,8 +76,16 @@ public class BaseBudget implements Budget{
         if(category instanceof ExpenseCategory) {
             list = this.expenseCategories;
         }
+        else if(category instanceof InvestmentCategory) {
+            list = this.investmentCategories;
+        }
+        else if(category instanceof IncomeCategory) {
+            list = this.incomeCategories;
+        }
 
-        if(list == null || alreadyHasCategory(category)) throw  new Exception("Kategoria już istnieje, lub nie ma kolekcji do której mozna ja dodac");
+        if(list == null || alreadyHasCategory(category))
+            throw  new Exception("Kategoria już istnieje, lub nie ma kolekcji do której mozna ja dodac");
+
         if(category.getMasterCategoryId() != null) {
             //TODO: addSubcategory to this masterCategory
         }

@@ -25,8 +25,7 @@ public class ExpenseCategory implements CashFlowCategory {
 
     public ExpenseCategory(int id, String name, Double expectedAmount, DateRange date) throws Exception {
         if(date == null) {
-            int month = LocalDate.now().getMonth().getValue();
-            date = new DateRangeImpl(LocalDate.now().getYear(), month);
+            date = DateRange.now();
         }
         expectedBalancesOverridesForMonth = new HashMap<>();
         expectedBalancesOverridesSinceMonth = new HashMap<>();

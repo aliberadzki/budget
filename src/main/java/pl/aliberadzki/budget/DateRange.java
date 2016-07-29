@@ -24,4 +24,8 @@ public interface DateRange {
     String toString();
 
     DateRange stripDays() throws Exception;
+
+    static DateRange now() throws Exception {
+        return new DateRangeImpl();
+    }
 }

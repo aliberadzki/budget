@@ -18,6 +18,15 @@ public class AddExpenseSubcategoryTransaction extends AddCategoryTransaction imp
         this.startingFrom = startingFrom;
     }
 
+    public AddExpenseSubcategoryTransaction(Integer budgetId, Integer categoryId, Integer masterCategoryId, String categoryName, Double amount) throws Exception {
+        this(budgetId, categoryId, masterCategoryId, categoryName, amount, DateRange.now());
+        try {
+            this.startingFrom = DateRange.now();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected CashFlowCategory getCashFlowCategory() throws Exception {
         return new ExpenseCategory(categoryId, masterCategoryId, categoryName, plannedAmount, startingFrom);

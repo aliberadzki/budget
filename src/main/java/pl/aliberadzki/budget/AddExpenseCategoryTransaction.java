@@ -17,6 +17,10 @@ public class AddExpenseCategoryTransaction extends AddCategoryTransaction implem
         this.expenseCategoryStartingFromDate = expenseCategoryStartingFromDate;
     }
 
+    public AddExpenseCategoryTransaction(Integer budgetId, Integer expenseCategoryId, String expenseCategoryName, Double plannedAmount) throws Exception {
+        this(budgetId, expenseCategoryId, expenseCategoryName, plannedAmount, DateRange.now());
+    }
+
     @Override
     protected CashFlowCategory getCashFlowCategory() throws Exception {
         return new ExpenseCategory(expenseCategoryId, expenseCategoryName, plannedAmount, expenseCategoryStartingFromDate);
