@@ -29,4 +29,5 @@ public interface CashFlowCategory {
 
     Integer getId();
 
+    CashFlowCategoryGroup getGroup();
 }

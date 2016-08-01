@@ -494,7 +494,7 @@ public class BaseBudgetTest {
 
 
         assertEquals( 5000.00, b.plannedMonthlyExpenses(new DateRangeImpl("201608")), 0.01);
-        assertEquals(13500.00, b.plannedMonthlyIncomes(new DateRangeImpl("201608")), 0.01);
+        assertEquals(14000.00, b.plannedMonthlyIncomes(new DateRangeImpl("201608")), 0.01);
         assertEquals( 5500.00, b.plannedMonthlyInvestments(new DateRangeImpl("201608")), 0.01);
     }
 }

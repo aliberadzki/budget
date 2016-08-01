@@ -58,7 +58,7 @@ public class DummyDatabase implements Datasource {
         //TODO: throw specific Exception
         if(!allBudgets.containsKey(budgetId)) throw new Exception("There is no budget with id " + budgetId);
 
-        if(masterCategoryId != null && alreadyHasSubcategoryOnThisLevel(budgetId, masterCategoryId,category)) {
+        if(masterCategoryId != null && alreadyHasSubcategoryOnThisLevel(category)) {
             throw new Exception("There is already category with this name on this level");
         }
 
@@ -90,7 +90,9 @@ public class DummyDatabase implements Datasource {
     @Override
     public void addOperation(Integer budgetId, Integer categoryId, Operation operation) throws Exception {
         //TODO: throw custom exception
-        if(allOperations.containsKey(operation.getId())) throw new Exception("There already is operation with id: " + operation.getId());
+        if(allOperations.containsKey(operation.getId()))
+            throw new Exception("There already is operation with id: " + operation.getId());
+
         this.allBudgets.get(budgetId).getCategory(categoryId).addOperation(operation);
         this.allOperations.put(operation.getId(), operation);
     }
@@ -98,12 +100,14 @@ public class DummyDatabase implements Datasource {
     @Override
     public void forceAddOperation(Integer budgetId, Integer categoryId, Operation operation) throws Exception {
         //TODO: throw custom exception
-        if(allOperations.containsKey(operation.getId())) throw new Exception("There already is operation with id: " + operation.getId());
+        if(allOperations.containsKey(operation.getId()))
+            throw new Exception("There already is operation with id: " + operation.getId());
+
         this.allBudgets.get(budgetId).getCategory(categoryId).forceAddOperation(operation);
         this.allOperations.put(operation.getId(), operation);
     }
 
-    private boolean alreadyHasSubcategoryOnThisLevel(Integer budgetId, Integer masterCategoryId, CashFlowCategory category) {
+    private boolean alreadyHasSubcategoryOnThisLevel(CashFlowCategory category) {
         //TODO: refactor
         Object[] cfcArr = this.allCategories.values().stream()
                 .filter(e -> e.getName().equals(category.getName()))

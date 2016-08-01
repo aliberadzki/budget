@@ -25,4 +25,6 @@ public interface Budget {
     CashFlowCategory getCategory(Integer categoryId);
 
     Double expensesSpentPercentage(DateRange dateRange);
+
+    String getName();
 }

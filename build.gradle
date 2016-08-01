@@ -11,5 +11,6 @@ repositories {
 dependencies {
     testCompile 'junit:junit:4.11',
             'info.cukes:cucumber-java8:1.2.4',
-            'info.cukes:cucumber-picocontainer:1.2.4'
+            'info.cukes:cucumber-picocontainer:1.2.4',
+            'org.xerial:sqlite-jdbc:3.8.9.1'
 }

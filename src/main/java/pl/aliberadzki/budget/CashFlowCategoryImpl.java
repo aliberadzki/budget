@@ -1,12 +1,11 @@
 package pl.aliberadzki.budget;
 
-import java.time.LocalDate;
 import java.util.*;
 
 /**
  * Created by aliberadzki on 2016-07-14.
  */
-public class ExpenseCategory implements CashFlowCategory {
+public class CashFlowCategoryImpl implements CashFlowCategory {
     private Map<DateRange, Double> expectedBalancesOverridesForMonth;
     private Map<DateRange, Double> expectedBalancesOverridesSinceMonth;
     private List<Operation> expenses;
@@ -18,12 +17,13 @@ public class ExpenseCategory implements CashFlowCategory {
     private String name;
     private Integer id;
     private Integer masterId;
+    private CashFlowCategoryGroup group;
 
-    public ExpenseCategory(int id, String name, Double expectedAmount) throws Exception {
-        this(id, name, expectedAmount, null);
+    public CashFlowCategoryImpl(Integer id, String name, CashFlowCategoryGroup group, Double expectedAmount) throws Exception {
+        this(id, name, group, expectedAmount, null);
     }
 
-    public ExpenseCategory(int id, String name, Double expectedAmount, DateRange date) throws Exception {
+    public CashFlowCategoryImpl(Integer id, String name, CashFlowCategoryGroup group,  Double expectedAmount, DateRange date) throws Exception {
         if(date == null) {
             date = DateRange.now();
         }
@@ -34,14 +34,14 @@ public class ExpenseCategory implements CashFlowCategory {
 
         this.name = name;
         this.id = id;
+        this.group = group;
         effectiveSince = date;
         basicAmount = expectedAmount == null ? 0.0 : expectedAmount;
     }
 
-    public ExpenseCategory(int id, int masterCategoryId, String name, Double plannedAmount, DateRange date) throws Exception {
-        this(id, name, plannedAmount, date);
+    public CashFlowCategoryImpl(Integer id, Integer masterCategoryId, String name, CashFlowCategoryGroup group,  Double plannedAmount, DateRange date) throws Exception {
+        this(id, name, group, plannedAmount, date);
         this.masterId = masterCategoryId;
-
     }
 
 
@@ -134,5 +134,10 @@ public class ExpenseCategory implements CashFlowCategory {
     @Override
     public Integer getId() {
         return id;
+    }
+
+    @Override
+    public CashFlowCategoryGroup getGroup() {
+        return group;
     }
 }
