@@ -30,4 +30,8 @@ public interface CashFlowCategory {
     Integer getId();
 
     CashFlowCategoryGroup getGroup();
+
+    Double getBasicAmount();
+
+    DateRange getStartingFrom();
 }

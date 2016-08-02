@@ -140,4 +140,14 @@ public class CashFlowCategoryImpl implements CashFlowCategory {
     public CashFlowCategoryGroup getGroup() {
         return group;
     }
+
+    @Override
+    public Double getBasicAmount() {
+        return basicAmount;
+    }
+
+    @Override
+    public DateRange getStartingFrom() {
+        return effectiveSince;
+    }
 }

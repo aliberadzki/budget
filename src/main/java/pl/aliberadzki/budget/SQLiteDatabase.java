@@ -23,13 +23,38 @@ public class SQLiteDatabase implements Datasource {
         statement = connection.createStatement();
 
         String sql = "CREATE TABLE BUDGET " +
-                "(ID INT PRIMARY KEY     NOT NULL," +
-                " NAME           TEXT    NOT NULL)";
+                "(ID    INT     PRIMARY KEY," +
+                " NAME  TEXT)";
         statement.executeUpdate(sql);
 
         sql = "CREATE TABLE CATEGORY " +
-                "(ID INT PRIMARY KEY     NOT NULL," +
-                " NAME           TEXT    NOT NULL)";
+                "(ID        INT     PRIMARY KEY," +
+                " BUDGET    INT," +
+                " MASTER    INT," +
+                " NAME      TEXT," +
+                " GROUP     TEXT," +
+                " AMOUNT    DOUBLE," +
+                " FROM      TEXT" +
+                " FOREIGN KEY(BUDGET) REFERENCES BUDGET(ID)," +
+                " FOREIGN KEY(MASTER) REFERENCES CATEGORY(ID)" +
+                ")";
+
+        sql = "CREATE TABLE CATEGORY_OVERRIDE " +
+                "(ID        INT    PRIMARY KEY," +
+                " CATEGORY  INT," +
+                " TYPE      TEXT," +
+                " AMOUNT    DOUBLE," +
+                " FROM      TEXT," +
+                " FOREIGN KEY (CATEGORY) REFERENCES CATEGORY(ID)" +
+                ")";
+
+        sql = "CREATE TABLE OPERATION " +
+                "(ID        INT    PRIMARY KEY," +
+                " CATEGORY  INT," +
+                " NAME      TEXT," +
+                " WHEN      TEXT," +
+                " FOREIGN KEY(CATEGORY) REFERENCES CATEGORY(ID)" +
+                ")";
         statement.executeUpdate(sql);
         statement.close();
         connection.close();
@@ -58,6 +83,21 @@ public class SQLiteDatabase implements Datasource {
 
     @Override
     public void addCategory(Integer budgetId, CashFlowCategory category) throws Exception {
+        String sql = "INSERT INTO CATEGORY (ID,BUDGET,MASTER,NAME,GROUP,AMOUNT,FROM) " +
+                "VALUES " +
+                "(" + category.getId() + ", " +
+                budgetId + "," +
+                category.getMasterCategoryId() +"," +
+                "'" + category.getName() +"'," +
+                "'" + category.getGroup().getCode() + "'," +
+                category.getBasicAmount() + "," +
+                "'" + category.getStartingFrom() + "'" +
+                ");";
+        try {
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         db.addCategory(budgetId, category);
     }
 
