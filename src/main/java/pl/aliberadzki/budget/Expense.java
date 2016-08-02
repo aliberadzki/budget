@@ -33,4 +33,9 @@ public class Expense implements Operation {
     public Integer getId() {
         return id;
     }
+
+    @Override
+    public String getName() {
+        return description;
+    }
 }

@@ -15,4 +15,11 @@ public interface CashFlowCategoryGroup {
     //Account targetAccount();
 
     String getCode();
+
+    static CashFlowCategoryGroup create(String group) {
+        if(group.equals(EXPENSE)) return new ExpenseGroup();
+        if(group.equals(INCOME)) return new IncomeGroup();
+        if(group.equals(INVESTMENT)) return new InvestmentGroup();
+        return null;
+    }
 }

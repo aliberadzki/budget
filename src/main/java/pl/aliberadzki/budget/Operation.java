@@ -10,4 +10,5 @@ public interface Operation {
 
     Integer getId();
 
+    String getName();
 }
